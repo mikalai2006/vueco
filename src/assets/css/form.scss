@@ -1,0 +1,61 @@
+@layer components {
+  .input {
+    @apply p-2 w-full appearance-none font-medium outline-none focus:ring-4 focus:ring-s-200 focus:border-s-400 dark:focus:ring-s-500 dark:focus:border-s-900 placeholder-s-300 dark:placeholder-s-500;
+    &-error {
+      @apply border-danger-500 dark:border-danger-600 focus:ring-danger-200 focus:border-danger-400 dark:focus:ring-danger-500 dark:focus:border-danger-900 placeholder-danger-300 dark:placeholder-danger-500;
+    }
+  }
+
+  /* form */
+  // .input {
+  //   @apply border-transparent outline-none focus:ring focus:ring-s-500 focus:border-s-500 block w-full;
+  //   &.outline {
+  //     @apply border-
+  //   }
+  // }
+  // .input {
+  //   @apply border border-s-100 dark:border-s-750 text-s-700 dark:text-s-200;
+  // }
+  // .input {
+  //   @apply border border-s-100 dark:border-s-750 text-s-700 dark:text-s-200;
+  //   // input {
+  //   //   @apply px-2 font-medium appearance-none focus:outline-none bg-transparent;
+  //   // }
+  //   &.active {
+  //     @apply ring-2 border-s-300 dark:border-s-600 ring-s-150 dark:ring-s-700;
+  //   }
+  //   &.danger {
+  //     @apply text-danger-700 dark:text-danger-300 bg-danger-50 dark:bg-danger-900 ring-danger-200 dark:ring-danger-800 border-danger-500 dark:border-danger-700;
+  //     input {
+  //       @apply placeholder-danger-400 dark:placeholder-danger-600;
+  //     }
+  //   }
+  //   // &.small {
+  //   //   @apply text-xs;
+  //   //   input {
+  //   //     @apply py-1 px-2;
+  //   //   }
+  //   // }
+  //   // &.big {
+  //   //   @apply text-xl;
+  //   //   input {
+  //   //     @apply py-2 px-4;
+  //   //   }
+  //   // }
+  // }
+  // // .input {
+  // //   @apply px-2 appearance-none leading-normal font-medium placeholder-s-300 dark:placeholder-s-500 text-s-700 dark:text-s-100 focus:outline-none bg-transparent;
+  // //   &.small {
+  // //     @apply py-1 px-2;
+  // //   }
+  // //   &.big {
+  // //     @apply py-2 px-4;
+  // //   }
+  // //   &.danger {
+  // //     @apply text-danger-500 bg-danger-100 placeholder-danger-500 border-danger-300 focus:border-danger-500 focus:ring-2 focus:ring-danger-200 dark:bg-danger-300 dark:text-danger-700 dark:placeholder-danger-700 dark:focus:ring-danger-400 dark:focus:border-danger-500;
+  // //   }
+  // //   &.danger::placeholder {
+  // //     @apply text-danger-400;
+  // //   }
+  // // }
+}

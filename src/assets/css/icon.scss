@@ -1,0 +1,8 @@
+@layer components {
+  .spinner {
+    @apply border-2 border-s-500 border-solid rounded-full animate-spin;
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+  }
+}

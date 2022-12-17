@@ -1,0 +1,162 @@
+@layer components {
+  .bordered {
+    @apply border;
+  }
+  .btn {
+    // @apply border border-transparent;
+    // &-small {
+    //   @apply text-xs py-1 px-2;
+    // }
+    // &-big {
+    //   @apply text-xl py-2 px-4;
+    // }
+    @apply px-4 py-2 cursor-pointer outline-none border-transparent flex items-center z-0 relative overflow-hidden transition tracking-wide whitespace-nowrap;
+
+    &.ringed {
+      &:focus,
+      &.active {
+        @apply ring-2;
+      }
+    }
+
+    &-primary {
+      // &.fill {
+      //   @apply bg-p-100 dark:bg-p-700;
+      // }
+      @apply text-p-700 dark:text-p-200;
+      &:hover,
+      &.active,
+      &:focus {
+        @apply bg-p-200 dark:bg-p-800;
+      }
+      &.bordered {
+        @apply border-p-200 dark:border-p-700;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply border-p-300 dark:border-p-600;
+        }
+      }
+      // &.inverse {
+      //   @apply text-p-300;
+      //   @apply border-p-700;
+      //   &:hover,
+      //   &.active,
+      //   &:focus {
+      //     @apply border-p-600 bg-p-600;
+      //   }
+      // }
+      &.fill {
+        @apply bg-p-600 text-white dark:bg-p-700 dark:text-p-50;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply bg-p-700 dark:bg-p-800 dark:text-white;
+        }
+      }
+      &.ringed {
+        @apply ring-p-500 dark:ring-p-700;
+        // &.inverse {
+        //   @apply ring-p-800;
+        // }
+      }
+    }
+
+    &-second {
+      // bg-s-100 dark:bg-s-700
+      @apply text-s-700 dark:text-s-200;
+      &:hover,
+      &.active,
+      &:focus {
+        @apply bg-s-50 dark:bg-s-700;
+      }
+      &.bordered {
+        @apply border-s-200 dark:border-s-700;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply border-s-300 dark:border-s-600;
+        }
+      }
+      &.fill {
+        @apply bg-s-600 text-white dark:bg-s-700 dark:text-s-50;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply bg-s-700 dark:bg-s-800 dark:text-white;
+        }
+      }
+      &.ringed {
+        @apply ring-s-500 dark:ring-s-600;
+      }
+    }
+
+    &-accent {
+      @apply text-a-700 dark:text-a-200;
+      // bg-a-100 dark:bg-a-700
+      &:hover,
+      &.active,
+      &:focus {
+        @apply bg-a-100 dark:bg-a-800;
+      }
+      &.bordered {
+        @apply border-a-200 dark:border-a-700;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply border-a-300 dark:border-a-600;
+        }
+      }
+      &.fill {
+        @apply bg-a-600 text-white dark:bg-a-700 dark:text-a-50;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply bg-a-700 dark:bg-a-800 dark:text-white;
+        }
+      }
+      &.ringed {
+        @apply ring-a-500 dark:ring-a-700;
+      }
+    }
+
+    &-danger {
+      //bg-d-100 dark:bg-d-700
+      @apply text-d-700 dark:text-d-200;
+      &:hover,
+      &.active,
+      &:focus {
+        @apply bg-d-50 dark:bg-d-800;
+      }
+      &.bordered {
+        @apply border-d-200 dark:border-d-700;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply border-d-300 dark:border-d-600;
+        }
+      }
+      &.fill {
+        @apply bg-d-600 text-white dark:bg-d-700 dark:text-d-50;
+        &:hover,
+        &.active,
+        &:focus {
+          @apply bg-d-700 dark:bg-d-800 dark:text-white;
+        }
+      }
+      &.ringed {
+        @apply ring-d-500 dark:ring-d-700;
+      }
+    }
+    &.disabled,
+    &.disabled.active {
+      @apply cursor-not-allowed bg-transparent text-s-300 dark:text-s-600 border-s-100 dark:border-s-600 hover:bg-transparent focus:bg-transparent hover:border-s-100 dark:bg-transparent dark:hover:bg-transparent focus:border-s-100 dark:hover:border-s-600 dark:focus:border-s-600;
+    }
+  }
+
+  .danger {
+    &.bordered {
+      @apply ring-d-100 dark:ring-d-700;
+    }
+  }
+}

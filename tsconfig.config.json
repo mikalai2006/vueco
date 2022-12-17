@@ -1,0 +1,62 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.node.json",
+  "include": [
+    "vite.config.*",
+    "vitest.config.*",
+    "cypress.config.*",
+    "playwright.config.*",
+
+    "src/components/**/*.ts",
+    // "src/**/*.d.ts",
+    // "src/**/*.tsx",
+    // "src/**/*.vue",
+    // "tests/**/*.ts",
+    // "tests/**/*.tsx",
+    // "types/index.d.ts",
+    "src/index.ts"
+  ],
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    // "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["node", "vite/client"], // , "@types/jest"
+    "useDefineForClassFields": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+
+    "outDir": "dist",
+    "declaration": true,
+    // "composite": true,
+    // "types": ["node"],
+    // "isolatedModules": true,
+    // "skipLibCheck": true,
+    // "resolveJsonModule": true,
+    // "esModuleInterop": true,
+    "preserveValueImports": true
+  },
+  "exclude": [
+    "src/tests",
+    "src/stories",
+    "src/directives",
+    "src/utils",
+    "src/App.vue",
+    "src/router",
+    "src/stores",
+    "src/stories/**/*.*",
+    "src/views",
+    "src/components/**/*.stories.ts",
+    "src/components/**/*.spec.ts",
+    "src/components/ui"
+  ]
+}

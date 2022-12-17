@@ -1,0 +1,40 @@
+@layer base {
+  body,
+  * {
+    @apply font-sans;
+  }
+  body,
+  .docs-story,
+  .app {
+    @apply bg-white dark:bg-s-900;
+  }
+  body.dark {
+    @apply bg-s-900;
+  }
+  body,
+  .docs-story,
+  .app {
+    @apply font-sans font-normal text-base text-s-800 dark:text-s-200;
+  }
+}
+
+.b-rounded {
+  @apply rounded-md;
+}
+.b-bordered {
+  @apply border border-s-200 dark:border-s-800;
+}
+
+.b-scroll::-webkit-scrollbar {
+  @apply cursor-pointer w-3;
+  /*background-color: rgba(229, 231, 235, var(--bg-opacity));*/
+}
+
+.b-scroll::-webkit-scrollbar-track {
+  @apply bg-s-100 dark:bg-s-800;
+  /*background: red;*/
+}
+.b-scroll::-webkit-scrollbar-thumb {
+  @apply box-border bg-s-400 dark:bg-s-600 rounded-md border-2 border-solid border-transparent bg-clip-content;
+  /*outline: 1px solid slategrey;*/
+}

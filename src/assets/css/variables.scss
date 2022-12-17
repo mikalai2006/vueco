@@ -1,0 +1,240 @@
+$colors: (
+  primary: #a95d8e,
+  // second: #4f7ba2,
+  //6B7280
+  //accent: #907243,
+  // danger: #e98074,,,
+);
+$colors_lime: (
+  primary: #719544,
+  // second: #595d61,
+  // accent: #86c232,
+  // danger: #ef4444,,,
+);
+$colors_gusto: (
+  primary: #978973,
+  // second: #8e8d8a,
+  //6B7280
+  //accent: #e85a4f,
+  // danger: #d27368,,,
+);
+$colors_blue: (
+  primary: #3b82f6,
+  // second: #64748b,
+  // accent: #eab308,
+  // danger: #ef4444,,,
+);
+
+$colors_purple: (
+  primary: #a855f7,
+  // second: #6b7280,
+  // accent: #eab308,
+  // danger: #ef4444,,,
+);
+$colors2: (
+  primary: #70b88f,
+  // second: #737373,
+  //6B7280
+  // accent: #e8d466,
+  // danger: #e98074,,,
+);
+:root,
+#root,
+.light {
+  @each $name, $color in $colors {
+    // --#{$name}-50: #{mix(white, $color, 97%)};
+    @for $i from 1 through 9 {
+      --#{$name}-#{$i * 50}: #{mix(
+          white,
+          $color,
+          (10 - $i) * ($i * 0.7 + 10%)
+        )};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+
+    --#{$name}-500: #{$color};
+
+    @for $j from 1 through 4 {
+      --#{$name}-#{$j * 100 + 500}: #{mix(black, $color, $j * 2 * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+  }
+}
+.gusto {
+  @each $name, $color in $colors_gusto {
+    @for $i from 1 through 9 {
+      --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+
+    --#{$name}-500: #{$color};
+
+    @for $j from 1 through 8 {
+      --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+  }
+}
+.lime {
+  @each $name, $color in $colors_lime {
+    @for $i from 1 through 9 {
+      --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+
+    --#{$name}-500: #{$color};
+
+    @for $j from 1 through 8 {
+      --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+  }
+}
+.blue {
+  @each $name, $color in $colors_blue {
+    @for $i from 1 through 9 {
+      --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+
+    --#{$name}-500: #{$color};
+
+    @for $j from 1 through 8 {
+      --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+  }
+}
+
+.purple {
+  @each $name, $color in $colors_purple {
+    @for $i from 1 through 9 {
+      --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+
+    --#{$name}-500: #{$color};
+
+    @for $j from 1 through 8 {
+      --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+      // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+    }
+  }
+}
+
+// $colors: (
+//   primary: #a95d8e,
+//   second: #4f7ba2,
+//   //6B7280
+//   accent: #907243,
+//   danger: #e98074,
+// );
+// $colors_lime: (
+//   primary: #719544,
+//   second: #595d61,
+//   accent: #86c232,
+//   danger: #ef4444,
+// );
+// $colors_gusto: (
+//   primary: #978973,
+//   second: #8e8d8a,
+//   //6B7280
+//   accent: #e85a4f,
+//   danger: #d27368,
+// );
+// $colors_blue: (
+//   primary: #3b82f6,
+//   second: #64748b,
+//   accent: #eab308,
+//   danger: #ef4444,
+// );
+
+// $colors_purple: (
+//   primary: #a855f7,
+//   second: #6b7280,
+//   accent: #eab308,
+//   danger: #ef4444,
+// );
+// :root,
+// #root,
+// .light {
+//   @each $name, $color in $colors {
+//     // --#{$name}-50: #{mix(white, $color, 97%)};
+//     @for $i from 1 through 9 {
+//       --#{$name}-#{$i * 50}: #{mix(
+//           white,
+//           $color,
+//           (10 - $i) * ($i * 0.7 + 10%)
+//         )};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+
+//     --#{$name}-500: #{$color};
+
+//     @for $j from 1 through 4 {
+//       --#{$name}-#{$j * 100 + 500}: #{mix(black, $color, $j * 2 * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+//   }
+// }
+// .gusto {
+//   @each $name, $color in $colors_gusto {
+//     @for $i from 1 through 9 {
+//       --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+
+//     --#{$name}-500: #{$color};
+
+//     @for $j from 1 through 8 {
+//       --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+//   }
+// }
+// .lime {
+//   @each $name, $color in $colors_lime {
+//     @for $i from 1 through 9 {
+//       --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+
+//     --#{$name}-500: #{$color};
+
+//     @for $j from 1 through 8 {
+//       --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+//   }
+// }
+// .blue {
+//   @each $name, $color in $colors_blue {
+//     @for $i from 1 through 9 {
+//       --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+
+//     --#{$name}-500: #{$color};
+
+//     @for $j from 1 through 8 {
+//       --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+//   }
+// }
+
+// .purple {
+//   @each $name, $color in $colors_purple {
+//     @for $i from 1 through 9 {
+//       --#{$name}-#{$i * 50}: #{mix(white, $color, (10 - $i) * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+
+//     --#{$name}-500: #{$color};
+
+//     @for $j from 1 through 8 {
+//       --#{$name}-#{$j * 50 + 500}: #{mix(black, $color, $j * 10%)};
+//       // --color-#{$name}-light-#{$i}: #{lighten($color, $i * 10%)};
+//     }
+//   }
+// }
