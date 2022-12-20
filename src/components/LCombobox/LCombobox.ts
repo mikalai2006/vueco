@@ -9,46 +9,147 @@ import {
   ref,
   withModifiers,
   type ComputedRef,
-  type HTMLAttributes,
   type InjectionKey,
   type PropType,
   type Ref,
   type WritableComputedRef,
+  onUnmounted,
+  watch,
 } from "vue";
 import type { IField } from "@/components/LForm";
 import { useId } from "@/composable/useId";
 
+export interface IComobobox {
+  after?: boolean;
+  autofocus?: boolean;
+  description?: string;
+  disabled?: boolean;
+  id: string;
+  items: (string | number)[];
+  keyLabel?: string;
+  keyValue?: string;
+  keyFilter?: string;
+  label?: string;
+  multiple?: boolean;
+  name: string;
+  placeholder?: string;
+}
+
+const isPrintableCharacter = (str: string) => {
+  return str.length === 1 && str.match(/\S| /);
+};
+
+// export const IGeneralPropsFormElement = {
+//   after: {
+//     type: Boolean,
+//     default: false,
+//     required: false,
+//   },
+//   autofocus: {
+//     type: Boolean,
+//     default: false,
+//     required: false,
+//   },
+//   description: {
+//     type: String,
+//     default: "",
+//     required: false,
+//   },
+//   disabled: {
+//     type: Boolean,
+//     default: false,
+//     required: false,
+//   },
+//   id: {
+//     type: String,
+//     required: true,
+//   },
+//   items: {
+//     type: Array,
+//     default: () => {
+//       return [];
+//     },
+//     required: true,
+//   },
+//   keyLabel: {
+//     type: String,
+//     default: "id",
+//     required: false,
+//   },
+//   keyValue: {
+//     type: String,
+//     default: "id",
+//     required: false,
+//   },
+//   keyFilter: {
+//     type: String,
+//     default: "id",
+//     required: false,
+//   },
+//   label: {
+//     type: String,
+//     default: "",
+//     required: false,
+//   },
+//   multiple: {
+//     type: Boolean,
+//     default: false,
+//     required: false,
+//   },
+//   name: {
+//     type: String,
+//     default: "name",
+//     required: false,
+//   },
+//   placeholder: {
+//     type: String,
+//     default: "placeholder",
+//     required: false,
+//   },
+//   // autocomplete?: string;
+//   // co?: string;
+//   // component?: string;
+//   // group?: string;
+//   // multi?: boolean;
+//   // rules?: {
+//   //   type: string;
+//   //   params: any[];
+//   // }[];
+//   // size?: number;
+//   // type?: string;
+//   // vtype?: string;
+// };
+
 export type TOption =
   | {
-      [key: string]: string | number | boolean;
+      [key: string]: string | number;
     }
   | string
-  | number
-  | boolean;
+  | number;
 export type TComboboxModel = number | string | [];
 export type StateComboboxDefinition = {
   // State
   comboboxNode: Ref<HTMLFormElement | null>;
-  buttonNode: Ref<HTMLFormElement | null>;
+  buttonNode?: Ref<HTMLFormElement | null>;
   listboxNode: Ref<HTMLFormElement | null>;
 
   comboboxHasVisualFocus: Ref<boolean>;
   listboxHasVisualFocus: Ref<boolean>;
-
   hasHover: Ref<boolean>;
+
   focusOption: Ref<number>;
 
   isNone: Ref<boolean>;
   isList: Ref<boolean>;
   isBoth: Ref<boolean>;
 
-  allOptions: Ref<{ key: string; el: HTMLElement | null }[]>;
+  allOptions: Ref<{ index: string; key: string; el: HTMLElement | null }[]>;
 
   option: Ref<TOption | null>;
-  firstOption: Ref<TOption | null>;
-  lastOption: Ref<TOption | null>;
+  // firstOption: Ref<TOption | null>;
+  // lastOption: Ref<TOption | null>;
 
-  filteredOptions: ComputedRef<(TOption | null)[]>;
+  filteredOptions: Ref<(TOption | null)[]>;
   filter: Ref<string>;
   filterText: Ref<string>;
 
@@ -65,12 +166,14 @@ export type StateComboboxDefinition = {
   hasOptions: ComputedRef<boolean>;
 
   open: () => void;
-  close: (force?: boolean) => void;
+  close: (e?: Event | undefined, force?: boolean) => void;
   registerOverlay: () => void;
   unRegisterOverlay: () => void;
-  onChangeActiveIndex: (event: KeyboardEvent) => number;
+  onChangeActiveIndex: (event: KeyboardEvent, index?: number) => number;
   onSetFocusOption: () => void;
-  onChooseOption: (option: TOption) => void;
+  onChooseOption: (option: TOption, flag?: boolean) => void;
+  onFilterOptions: (flag?: boolean) => TOption[];
+  onSetValue: () => void;
 };
 
 export const ComboboxContext = Symbol(
@@ -96,6 +199,7 @@ export const LCombobox = defineComponent({
       type: String,
       default: "",
     },
+    // ...IGeneralPropsFormElement,
   },
   emits: ["update:showList", "update:modelValue", "onLoadItems", "on-input"],
   setup(props, { slots, emit }) {
@@ -107,13 +211,11 @@ export const LCombobox = defineComponent({
     const isBoth = ref<StateComboboxDefinition["isBoth"]["value"]>(false);
     const field = ref<StateComboboxDefinition["field"]["value"]>(props.field);
 
-    const focusOption = ref<StateComboboxDefinition["focusOption"]["value"]>(0);
+    const focusOption =
+      ref<StateComboboxDefinition["focusOption"]["value"]>(-1);
     const hasOptions = computed<StateComboboxDefinition["hasOptions"]["value"]>(
-      () => focusOption.value > 0
+      () => filteredOptions.value.length > 0 // focusOption.value > 0
     );
-
-    const filter = ref<StateComboboxDefinition["filter"]["value"]>("");
-
     const option = ref<StateComboboxDefinition["option"]["value"]>(null);
     const isOpen = ref<StateComboboxDefinition["isOpen"]["value"]>(false);
     const hasHover = ref<StateComboboxDefinition["hasHover"]["value"]>(false);
@@ -146,35 +248,82 @@ export const LCombobox = defineComponent({
       },
     });
 
+    const filter = ref<StateComboboxDefinition["filter"]["value"]>("");
     const filterText = ref<StateComboboxDefinition["filterText"]["value"]>("");
-    const filteredOptions = computed<
+    const filteredOptions = ref<
       StateComboboxDefinition["filteredOptions"]["value"]
-    >(() => {
-      console.time("filteredOptions");
+    >([]);
 
-      const allOptions = field.value.items || [];
-      let result: TOption[] = allOptions;
-      const keyFilter = field.value.keyFilter;
-      if (keyFilter) {
-        result = allOptions
-          .filter((x) =>
-            typeof x == "object"
-              ? x[keyFilter]
-                  .toLowerCase()
-                  .indexOf(filterText.value.toLowerCase()) !== -1
-              : typeof x == "number"
-              ? x !== -1
-              : x.toLowerCase().indexOf(filterText.value.toLowerCase()) !== -1
-          )
-          .sort(
-            (a: any, b: any) =>
-              combobox.model.value.indexOf(a[keyFilter]) -
-              combobox.model.value.indexOf(b[keyFilter])
-          );
+    const onFilterOptions = (flag?: boolean) => {
+      console.time("onFilterOptions");
+
+      if (typeof flag !== "boolean") {
+        flag = false;
       }
-      console.timeEnd("filteredOptions");
-      return result;
-    });
+
+      // let _option = null;
+      // let _currentOption = combobox.option.value;
+      const _filter = filter.value.toLowerCase();
+
+      let _filteredOptions: TOption[] = [];
+      const _keyFilter = field.value.keyFilter;
+      const _allOptions = field.value.items || [];
+      // this.listboxNode.innerHTML = '';
+
+      console.log("filter value=", filter.value);
+      // do not filter any options if autocomplete is none
+      if ((isNone.value || filter.value.length === 0) && !flag) {
+        // filter.value = "";
+        _filteredOptions = _allOptions;
+      } else {
+        if (_keyFilter) {
+          _filteredOptions = _allOptions
+            .filter((x) =>
+              typeof x == "object"
+                ? x[_keyFilter].toLowerCase().indexOf(_filter) === 0
+                : typeof x == "number"
+                ? x !== -1
+                : x.toLowerCase().indexOf(_filter) === 0
+            )
+            .sort(
+              (a: any, b: any) =>
+                combobox.model.value.indexOf(a[_keyFilter]) -
+                combobox.model.value.indexOf(b[_keyFilter])
+            );
+        }
+      }
+
+      // const allOptions = field.value.items || [];
+      // let result: TOption[] = allOptions;
+      // if (keyFilter) {
+      //   result = allOptions
+      //     .filter((x) =>
+      //       typeof x == "object"
+      //         ? x[keyFilter]
+      //             .toLowerCase()
+      //             .indexOf(filterText.value.toLowerCase()) !== -1
+      //         : typeof x == "number"
+      //         ? x !== -1
+      //         : x.toLowerCase().indexOf(filterText.value.toLowerCase()) !== -1
+      //     )
+      //     .sort(
+      //       (a: any, b: any) =>
+      //         combobox.model.value.indexOf(a[keyFilter]) -
+      //         combobox.model.value.indexOf(b[keyFilter])
+      //     );
+      // }
+      filteredOptions.value = _filteredOptions;
+      console.timeEnd("onFilterOptions");
+
+      return _filteredOptions;
+    };
+
+    watch(
+      () => props.field.items,
+      () => {
+        onFilterOptions();
+      }
+    );
 
     if (field.value.autocomplete) {
       if (typeof field.value.autocomplete === "string") {
@@ -189,139 +338,228 @@ export const LCombobox = defineComponent({
     }
 
     const open = () => {
+      console.log("===open");
       isOpen.value = true;
+      // onChooseFirstSelectedOption();
+
+      setTimeout(() => {
+        registerOverlay();
+      }, 10);
+      nextTick(() => {
+        if (!combobox.isNone.value) {
+          comboboxNode.value?.setSelectionRange(
+            0,
+            combobox.filter.value.length
+          );
+        }
+      });
       // this.buttonNode.setAttribute('aria-expanded', 'true');
     };
 
-    const close = () => {
-      // force?: boolean
-      // if (typeof force !== "boolean") {
-      //   force = false;
-      // }
+    const close = (e: Event | undefined, force?: boolean) => {
+      // console.log("close: start", e.target, force);
 
+      if (typeof force !== "boolean") {
+        force = false;
+      }
+      if (!e) return;
+      const el = e.target as HTMLInputElement | null;
+      // if (
+      //   !force ||
+      //   combobox.listboxNode.value?.contains(el) ||
+      //   combobox.comboboxNode.value == el
+      // ) {
+      //   return;
+      // }
       if (
-        !comboboxHasVisualFocus.value &&
-        !listboxHasVisualFocus.value &&
-        !hasHover.value
+        force ||
+        (!combobox.listboxNode.value?.contains(el) &&
+          combobox.comboboxNode.value != el)
       ) {
+        console.log("===close: force=", force);
+        unRegisterOverlay();
         // this.setCurrentOptionStyle(false);
         isOpen.value = false;
         // this.buttonNode.setAttribute("aria-expanded", "false");
         // this.setActiveDescendant(false);
         comboboxNode.value?.focus();
+        combobox.focusOption.value = -1;
+        if (!field.value.multiple) {
+          nextTick(() => {
+            if (!combobox.isNone.value) {
+              comboboxNode.value?.setSelectionRange(
+                combobox.filter.value.length,
+                combobox.filter.value.length
+              );
+            }
+          });
+        }
       }
     };
 
     const unRegisterOverlay = () => {
-      document.removeEventListener("click", close);
-      document.removeEventListener("keyup", close);
+      if (document) {
+        document.removeEventListener("click", close);
+        document.removeEventListener("keyup", close);
+      }
       console.log("unRegisterOverlay");
     };
 
     const registerOverlay = () => {
-      document.addEventListener("click", close);
-      document.addEventListener("keyup", close);
+      if (document) {
+        document.addEventListener("click", close);
+        document.addEventListener("keyup", close);
+      }
       console.log("registerOverlay");
     };
 
-    const onChangeActiveIndex = (e: KeyboardEvent) => {
+    const onChangeActiveIndex = (e: KeyboardEvent, index?: number) => {
       let newIndex = combobox.focusOption.value || 0;
 
-      if (combobox.focusOption.value == -1) {
-        newIndex = 0;
+      if (index || index === 0) {
+        newIndex = index;
+      } else {
+        // if (combobox.focusOption.value == -1) {
+        //   newIndex = 0;
+        // }
+        if (e.key === "ArrowDown") {
+          newIndex++;
+          // e.preventDefault();
+        } else if (e.key === "ArrowUp") {
+          newIndex--;
+          // e.preventDefault();
+        }
+        if (newIndex > combobox.allOptions.value.length - 1) {
+          newIndex = combobox.allOptions.value.length - 1;
+        }
+        if (newIndex < 0) {
+          newIndex = 0;
+        }
       }
-      if (e.key === "ArrowDown") {
-        newIndex++;
-        // e.preventDefault();
-      } else if (e.key === "ArrowUp") {
-        newIndex--;
-        // e.preventDefault();
-      }
-      if (newIndex > combobox.allOptions.value.length - 1) {
-        newIndex = combobox.allOptions.value.length - 1;
-      }
-      if (newIndex < 0) {
-        newIndex = 0;
-      }
-
       console.log("onChangeActiveIndex: newIndex=", newIndex);
       combobox.focusOption.value = newIndex;
       return newIndex;
     };
 
+    // const onChooseFirstSelectedOption = () => {
+    //   const keyValue = combobox.field.value.keyValue;
+    //   const firstValue = combobox.field.value.multiple
+    //     ? combobox.model.value[0]
+    //     : combobox.model.value;
+
+    //   let index = combobox.filteredOptions.value.findIndex((x) =>
+    //     keyValue && typeof x == "object"
+    //       ? x[keyValue] == firstValue
+    //       : x == firstValue
+    //   );
+    //   if (index == -1) {
+    //     combobox.focusOption.value = 0;
+    //     index = 0;
+    //   } else {
+    //     combobox.focusOption.value = index;
+    //   }
+    //   return index;
+    // };
+
     const onSetFocusOption = () => {
-      if (!combobox.focusOption.value) {
-        combobox.focusOption.value = 0;
-      }
-      // if (select.model.value.length <= 0) {
-      //   select.focusOption.value = 0;
-      //   // return;
+      // if (!combobox.focusOption.value) {
+      //   combobox.focusOption.value = 0;
       // }
-      const firstValue = combobox.field.value.multiple
-        ? combobox.model.value[0]
-        : combobox.model.value;
-
-      // if (!firstValue) return;
       const keyValue = combobox.field.value.keyValue;
-      const index = combobox.filteredOptions.value.findIndex((x) =>
-        keyValue && typeof x == "object"
-          ? x[keyValue] == firstValue
-          : x == firstValue
-      );
-      if (index && index != -1) {
-        combobox.focusOption.value = index;
-      } else {
-        // select.focusOption.value = 0;
-      }
-
-      // if (index == -1) {
-      //   select.selectButtonEl.value?.focus();
-      //   // return;
-      // }
       nextTick(() => {
         const value =
           combobox.filteredOptions.value[combobox.focusOption.value];
+        if (!value) {
+          // value = combobox.filteredOptions.value[0];
+          return;
+        }
         const elForFocus = combobox.allOptions.value.find(
-          (x) => x.key === (keyValue ? value[keyValue] : value)
+          (x) =>
+            x.index ===
+            (keyValue && typeof value == "object" ? value[keyValue] : value)
         );
         if (elForFocus?.el) {
           console.log("elForFocus.el=", elForFocus.el);
           //  && !select.searchEl.value
           elForFocus.el?.focus();
         }
+
+        // model.value = [keyValue ? value[keyValue] : value];
       });
-      // console.log(
-      //   "set focus",
-      //   firstValue,
-      //   "focusOption.value=",
-      //   index,
-      //   keyValue
-      // );
     };
 
     /**
      * Choose option.
      * @param option object | string | number
      */
-    const onChooseOption = (option: TOption) => {
-      const value =
+    const onChooseOption = (option: TOption, flag: boolean) => {
+      if (typeof flag !== "boolean") {
+        flag = false;
+      }
+      const value: any =
         combobox.field.value.keyValue && typeof option == "object"
           ? option[combobox.field.value.keyValue]
           : option;
-      const index = combobox.model.value.findIndex(
-        (x: number | string) => x === value
-      );
-      let newValue: (string | number)[] = [...combobox.model.value];
+      const index = combobox.model.value.findIndex((x: any) => x === value);
+      let newValue = [...combobox.model.value];
       if (combobox.field.value.multiple) {
         if (index !== -1) {
           newValue.splice(index, 1);
         } else {
           newValue.push(value);
         }
+        combobox.filter.value = `${value}`;
       } else {
         newValue = [value];
+        combobox.filter.value = `${value}`;
       }
-      combobox.model.value = newValue;
+      if (!isNone.value) {
+        nextTick(() => {
+          if (flag) {
+            combobox.comboboxNode.value?.setSelectionRange(
+              0,
+              combobox.filter.value.length
+            );
+          } else {
+            combobox.comboboxNode.value?.setSelectionRange(
+              combobox.filterText.value.length,
+              combobox.filter.value.length
+            );
+          }
+        });
+      }
+      // combobox.model.value = newValue;
+
+      // if (!combobox.field.value.multiple) {
+
+      //   // combobox.filterText.value = value;
+      // }
+      console.log("onChooseOption:", combobox.model.value, option);
+    };
+
+    const onSetValue = () => {
+      // const _keyValue = combobox.field.value.keyValue;
+      // console.group("onSetValue");
+      // console.log("filteredOptions: ", combobox.filteredOptions);
+      // console.log("filter: ", combobox.filter.value);
+      if (field.value.multiple) {
+        const newValue: TComboboxModel[] = [...combobox.model.value];
+        const indexExists = combobox.model.value.findIndex(
+          (x) => x == combobox.filter.value
+        );
+        // console.log("indexExists=", indexExists);
+        if (indexExists != -1) {
+          newValue.splice(indexExists, 1);
+        } else {
+          newValue.push(combobox.filter.value);
+        }
+        combobox.model.value = newValue;
+        filter.value = "";
+      } else {
+        combobox.model.value = [combobox.filter.value];
+      }
+      // console.log("combobox.model.value=", combobox.model.value);
+      console.groupEnd();
     };
 
     const combobox = {
@@ -360,6 +598,8 @@ export const LCombobox = defineComponent({
       onChangeActiveIndex,
       onSetFocusOption,
       onChooseOption,
+      onFilterOptions,
+      onSetValue,
     };
 
     const loadData = async () => {
@@ -375,6 +615,7 @@ export const LCombobox = defineComponent({
           combobox.comboboxNode.value?.focus();
         }
       });
+      await onFilterOptions();
     });
 
     provide(ComboboxContext, combobox);
@@ -382,7 +623,20 @@ export const LCombobox = defineComponent({
     return () =>
       h(
         "div",
-        {},
+        {
+          onClick: withModifiers(
+            (e: MouseEvent) => {
+              console.log("LComboboxInput: onClick");
+              if (combobox.isOpen.value) {
+                combobox.close(e, true);
+              } else {
+                combobox.open();
+              }
+              comboboxNode.value?.focus();
+            },
+            ["stop"]
+          ),
+        },
         {
           default: () =>
             slots.default
@@ -406,24 +660,41 @@ export const LComboboxInput = defineComponent({
       return;
     }
 
-    const query = ref("");
+    // const query = ref("");
     const searchDebounce = ref<ReturnType<typeof setTimeout> | null>(null);
     const onSearch = () => {
-      combobox.filterText.value = query.value;
+      combobox.filterText.value = combobox.filter.value;
       // select.onLoadItems({ text: newValue.value })
       combobox.isBusy.value = false;
-      // select.focusOption.value = 0;
-      if (!combobox.isOpen.value) {
-        combobox.isOpen.value = true;
-        setTimeout(() => {
-          combobox.registerOverlay();
-        }, 50);
-      }
+      combobox.focusOption.value = -1;
+      !combobox.isOpen.value && combobox.open();
+      combobox.onFilterOptions();
+      nextTick(() => {
+        if (combobox.isBoth.value) {
+          const addOption = combobox.filteredOptions.value[0];
+          if (addOption && combobox.filterText.value.length) {
+            combobox.onChooseOption(addOption);
+            // !combobox.field.value.multiple && combobox.close(e, true);
+          }
+        }
+      });
+      // combobox.comboboxNode.value?.setSelectionRange(
+      //   combobox.filterText.value.length - 1,
+      //   combobox.filterText.value.length
+      // );
     };
 
-    const isPrintableCharacter = (str: string) => {
-      return str.length === 1 && str.match(/\S| /);
-    };
+    // if (combobox.field.value.autocomplete) {
+    watch(
+      () => combobox.model.value,
+      (val) => {
+        if (combobox.isBoth.value && !combobox.field.value?.multiple) {
+          combobox.filter.value = `${val[0]}`;
+        }
+      }
+    );
+    // }
+
     // const aria = computed(() => {
     //   const aria: HTMLAttributes = {};
     //   aria["aria-controls"] = `${combobox.field.value.name}-listbox`;
@@ -436,35 +707,57 @@ export const LComboboxInput = defineComponent({
         {
           ref: combobox.comboboxNode,
           id: combobox.field.value.id,
-          value: query.value,
+          value: combobox.filter.value,
           type: "text",
           name: combobox.field.value.id,
           role: "combobox",
+          tabindex: 0,
+          placeholder: combobox.field.value.placeholder,
           "aria-autocomplete": combobox.autocomplete.value,
           "aria-expanded": combobox.isOpen.value,
           "aria-controls": `${combobox.field.value.name}-listbox`,
+          "aria-activedescendant": `${
+            combobox.allOptions.value[combobox.focusOption.value]?.key || ""
+          }`,
           onInput: (e: KeyboardEvent) => {
             const el = e.target as HTMLInputElement;
             if (searchDebounce.value) clearTimeout(searchDebounce.value);
             combobox.isBusy.value = true;
-            searchDebounce.value = setTimeout(() => onSearch(), 350);
-            query.value = el.value;
+            combobox.filter.value = el.value;
+            searchDebounce.value = setTimeout(() => onSearch(), 500);
           },
-          onClick: withModifiers(() => {
-            console.log("LComboboxInput: onClick");
-            if (combobox.isOpen.value) {
-              combobox.close();
-            } else {
-              combobox.open();
-            }
-          }, []),
+          onClick: withModifiers(
+            (e: MouseEvent) => {
+              console.log("LComboboxInput: onClick");
+              if (combobox.isOpen.value) {
+                combobox.close(e, true);
+              } else {
+                combobox.open();
+              }
+            },
+            ["stop"]
+          ),
           onKeydown: withModifiers((e: KeyboardEvent) => {
-            console.log("LComboboxInput: onKeydown");
+            console.log("LComboboxInput: onKeydown", e.keyCode, e.key);
             let flag = false;
-            let altKey = e.altKey;
+            const altKey = e.altKey;
             switch (e.key) {
               case "Enter":
                 console.log("LComboboxInput: press Enter");
+                if (combobox.isOpen.value && combobox.focusOption.value != -1) {
+                  const addOption =
+                    combobox.filteredOptions.value[combobox.focusOption.value];
+                  if (addOption) {
+                    combobox.onChooseOption(addOption, true);
+                    // !combobox.field.value.multiple && combobox.close(e, true);
+                    combobox.onSetValue();
+                  }
+                  if (!combobox.field.value.multiple) {
+                    combobox.close(e, true);
+                    combobox.onFilterOptions(true);
+                  }
+                }
+                combobox.filterText.value = "";
                 // if (this.listboxHasVisualFocus) {
                 //   this.setValue(this.option.textContent);
                 // }
@@ -477,13 +770,21 @@ export const LComboboxInput = defineComponent({
                 console.log("LComboboxInput: press ArrowDown, Down");
                 if (combobox.hasOptions) {
                   if (altKey) {
-                    combobox.open();
+                    !combobox.isOpen.value && combobox.open();
                   } else {
-                    combobox.open();
+                    !combobox.isOpen.value && combobox.open();
                     combobox.onChangeActiveIndex(e);
+                    const currentOption =
+                      combobox.filteredOptions.value[
+                        combobox.focusOption.value
+                      ];
+                    if (currentOption && combobox.isBoth.value) {
+                      combobox.onChooseOption(currentOption, true);
+                    }
                     combobox.onSetFocusOption();
                     nextTick(() => {
                       combobox.comboboxNode.value?.focus();
+                      combobox.filterText.value = "";
                     });
                     // if (
                     //   this.listboxHasVisualFocus ||
@@ -503,20 +804,40 @@ export const LComboboxInput = defineComponent({
               case "ArrowUp":
                 console.log("LComboboxInput: press Up, ArrowUp");
                 if (combobox.hasOptions) {
-                  combobox.onChangeActiveIndex(e);
-                  combobox.onSetFocusOption();
-                  nextTick(() => {
-                    combobox.comboboxNode.value?.focus();
-                  });
-                  // if (this.listboxHasVisualFocus) {
-                  //   this.setOption(this.getPreviousOption(this.option), true);
-                  // } else {
-                  //   this.open();
-                  //   if (!altKey) {
-                  //     this.setOption(this.lastOption, true);
-                  //     this.setVisualFocusListbox();
-                  //   }
-                  // }
+                  if (altKey) {
+                    combobox.open();
+                  } else {
+                    if (!combobox.isOpen.value) {
+                      combobox.open();
+                      combobox.onChangeActiveIndex(
+                        e,
+                        combobox.filteredOptions.value.length - 1
+                      );
+                    } else {
+                      combobox.onChangeActiveIndex(e);
+                    }
+                    combobox.onSetFocusOption();
+                    const currentOption =
+                      combobox.filteredOptions.value[
+                        combobox.focusOption.value
+                      ];
+                    if (currentOption && combobox.isBoth.value) {
+                      combobox.onChooseOption(currentOption);
+                    }
+                    nextTick(() => {
+                      combobox.comboboxNode.value?.focus();
+                      combobox.filterText.value = "";
+                    });
+                    // if (this.listboxHasVisualFocus) {
+                    //   this.setOption(this.getPreviousOption(this.option), true);
+                    // } else {
+                    //   this.open();
+                    //   if (!altKey) {
+                    //     this.setOption(this.lastOption, true);
+                    //     this.setVisualFocusListbox();
+                    //   }
+                    // }
+                  }
                 }
                 flag = true;
                 break;
@@ -524,20 +845,27 @@ export const LComboboxInput = defineComponent({
               case "Escape":
                 console.log("LComboboxInput: press Esc, Escape");
                 if (combobox.isOpen.value) {
-                  combobox.close();
-                  combobox.filterText.value = "";
-                  // this.filterOptions();
+                  combobox.close(e, true);
                   // this.setVisualFocusCombobox();
+                  combobox.comboboxNode.value?.setSelectionRange(
+                    combobox.filter.value.length,
+                    combobox.filter.value.length
+                  );
                 } else {
+                  combobox.model.value = [];
+                  combobox.filter.value = "";
+                  combobox.filterText.value = "";
                   // this.setValue('');
                   // this.comboboxNode.value = '';
                 }
-                combobox.unRegisterOverlay();
-                combobox.option.value = null;
+                // combobox.unRegisterOverlay();
+                // combobox.option.value = null;
+                combobox.onFilterOptions(true);
                 flag = true;
                 break;
               case "Tab":
                 console.log("LComboboxInput: press Tab");
+                combobox.close(e, true);
                 // this.close(true);
                 // if (this.listboxHasVisualFocus) {
                 //   if (this.option) {
@@ -548,11 +876,16 @@ export const LComboboxInput = defineComponent({
                 break;
               case "Home":
                 console.log("LComboboxInput: press Home");
-                // this.comboboxNode.setSelectionRange(0, 0);
+                combobox.comboboxNode.value?.setSelectionRange(0, 0);
                 flag = true;
                 break;
               case "End":
                 console.log("LComboboxInput: press End");
+
+                combobox.comboboxNode.value?.setSelectionRange(
+                  combobox.filter.value.length,
+                  combobox.filter.value.length
+                );
                 // var length = this.comboboxNode.value.length;
                 // this.comboboxNode.setSelectionRange(length, length);
                 flag = true;
@@ -567,20 +900,29 @@ export const LComboboxInput = defineComponent({
             }
           }, []),
           onKeyup: withModifiers((e: KeyboardEvent) => {
-            console.log("LComboboxInput: onKeyup");
-            let flag = false,
-              option = null;
+            console.log("LComboboxInput: onKeyup, ", e.key);
+            let flag = false;
+            // option = null;
             const char = e.key;
 
-            if (isPrintableCharacter(char)) {
-              combobox.filter.value += char;
-            }
+            // if (isPrintableCharacter(char)) {
+            //   combobox.filter.value += char;
+            // }
+            // console.log(
+            //   ".......",
+            //   combobox.filterText.value,
+            //   combobox.filter.value
+            // );
+
             // this is for the case when a selection in the textbox has been deleted
-            if (query.value.length < combobox.filter.value.length) {
-              combobox.filter.value = query.value;
-              combobox.option.value = null;
-              // this.filterOptions();
-            }
+            // if (
+            //   combobox.filterText.value.length < combobox.filter.value.length
+            // ) {
+            //   combobox.filterText.value = combobox.filter.value;
+            //   combobox.option.value = null;
+            //   combobox.onFilterOptions();
+            //   // this.filterOptions();
+            // }
 
             if (e.key === "Escape" || e.key === "Esc") {
               return;
@@ -591,9 +933,10 @@ export const LComboboxInput = defineComponent({
                 console.log("LComboboxInput: onKeyup: Backspace");
                 // this.setVisualFocusCombobox();
                 // this.setCurrentOptionStyle(false);
-                combobox.filter.value = query.value;
-                combobox.option.value = null;
+                // combobox.filterText.value = combobox.filter.value;
+                // combobox.option.value = null;
                 // this.filterOptions();
+                combobox.onFilterOptions();
                 flag = true;
                 break;
 
@@ -605,13 +948,13 @@ export const LComboboxInput = defineComponent({
               case "End":
                 console.log("LComboboxInput: onKeyup: Left or other");
                 if (combobox.isBoth.value) {
-                  combobox.filter.value = query.value;
+                  // combobox.filterText.value = combobox.filter.value;
                 } else {
-                  combobox.option.value = null;
+                  // combobox.option.value = null;
                   // this.setCurrentOptionStyle(false);
                 }
                 // this.setVisualFocusCombobox();
-                flag = true;
+                // flag = true;
                 break;
 
               default:
@@ -662,16 +1005,213 @@ export const LComboboxInput = defineComponent({
           }, []),
           onFocus: () => {
             console.log("LComboboxInput: onFocus");
-            combobox.filter.value = query.value;
+            // combobox.filterText.value = combobox.filter.value;
             // this.filterOptions();
+            // combobox.onFilterOptions();
             // this.setVisualFocusCombobox();
-            combobox.option.value = null;
+            // combobox.option.value = null;
             // this.setCurrentOptionStyle(null);
           },
           onBlur: () => {
             console.log("LComboboxInput: onBlur");
             // this.removeVisualFocusAll();
           },
+        },
+        slots.default ? slots.default({}) : []
+      );
+  },
+});
+
+export const LComboboxButton = defineComponent({
+  name: "LComboboxButton",
+  setup(props, { slots }) {
+    const combobox = inject(ComboboxContext);
+    if (!combobox) {
+      console.info("LComboboxButton must be nested to LCombobox component");
+      return;
+    }
+
+    // const onSearch = () => {
+    //   combobox.filterText.value = combobox.filter.value;
+    //   combobox.isBusy.value = false;
+    //   combobox.focusOption.value = -1;
+    //   !combobox.isOpen.value && combobox.open();
+    //   combobox.allOptions.value.findIndex((x) =>
+    //     x[combobox.field.value.keyValue]
+    //       .toLowerCase()
+    //       .startsWith(combobox.filter.value)
+    //   );
+    //   nextTick(() => {
+    //     if (combobox.isBoth.value) {
+    //       const addOption = combobox.filteredOptions.value[0];
+    //       if (addOption && combobox.filterText.value.length) {
+    //         combobox.onChooseOption(addOption);
+    //         // !combobox.field.value.multiple && combobox.close(e, true);
+    //       }
+    //     }
+    //   });
+    // };
+
+    return () =>
+      h(
+        "div",
+        {
+          ref: combobox.comboboxNode,
+          id: combobox.field.value.id,
+          name: combobox.field.value.id,
+          role: "combobox",
+          tabindex: 0,
+          "aria-labelledby": `${combobox.field.value.id}_label`,
+          "aria-expanded": combobox.isOpen.value,
+          "aria-controls": `${combobox.field.value.name}-listbox`,
+          "aria-activedescendant": `${
+            combobox.allOptions.value[combobox.focusOption.value]?.key || ""
+          }`,
+          onClick: withModifiers((e: MouseEvent) => {
+            console.log("LComboboxButton: onClick");
+            if (combobox.isOpen.value) {
+              combobox.close(e, true);
+            } else {
+              combobox.open();
+            }
+          }, []),
+          onKeydown: withModifiers((e: KeyboardEvent) => {
+            console.log("LComboboxButton: onKeydown");
+            let flag = false;
+            const altKey = e.altKey;
+            switch (e.key) {
+              case "Enter":
+                console.log("LComboboxButton: press Enter");
+                if (combobox.isOpen.value && combobox.focusOption.value != -1) {
+                  const addOption =
+                    combobox.filteredOptions.value[combobox.focusOption.value];
+                  if (addOption) {
+                    combobox.onChooseOption(addOption, true);
+                    // !combobox.field.value.multiple && combobox.close(e, true);
+                    combobox.onSetValue();
+                  }
+                  if (!combobox.field.value.multiple) {
+                    combobox.close(e, true);
+                    // combobox.onFilterOptions(true);
+                  }
+                }
+                // combobox.filterText.value = "";
+                flag = true;
+                break;
+              case "ArrowDown":
+              case "Down":
+                console.log("LComboboxButton: press ArrowDown, Down");
+                if (combobox.hasOptions) {
+                  if (altKey) {
+                    !combobox.isOpen.value && combobox.open();
+                  } else {
+                    if (!combobox.isOpen.value) {
+                      combobox.open();
+                      if (combobox.focusOption.value <= 0) {
+                        combobox.focusOption.value = 0;
+                      }
+                      combobox.onChangeActiveIndex(
+                        e,
+                        combobox.focusOption.value
+                      );
+                    } else {
+                      combobox.onChangeActiveIndex(e);
+                    }
+                    // const currentOption =
+                    //   combobox.filteredOptions.value[
+                    //     combobox.focusOption.value
+                    //   ];
+                    // if (currentOption && combobox.isBoth.value) {
+                    //   combobox.onChooseOption(currentOption, true);
+                    // }
+                    combobox.onSetFocusOption();
+                    nextTick(() => {
+                      combobox.comboboxNode.value?.focus();
+                      // combobox.filterText.value = "";
+                    });
+                  }
+                }
+                flag = true;
+                break;
+              case "Up":
+              case "ArrowUp":
+                console.log("LComboboxButton: press Up, ArrowUp");
+                if (combobox.hasOptions) {
+                  if (altKey) {
+                    combobox.open();
+                  } else {
+                    if (!combobox.isOpen.value) {
+                      combobox.open();
+                      if (combobox.focusOption.value <= 0) {
+                        combobox.focusOption.value =
+                          combobox.filteredOptions.value.length - 1;
+                      }
+                      combobox.onChangeActiveIndex(
+                        e,
+                        combobox.focusOption.value
+                      );
+                    } else {
+                      combobox.onChangeActiveIndex(e);
+                    }
+                    combobox.onSetFocusOption();
+                    // const currentOption =
+                    //   combobox.filteredOptions.value[
+                    //     combobox.focusOption.value
+                    //   ];
+                    // if (currentOption && combobox.isBoth.value) {
+                    //   combobox.onChooseOption(currentOption);
+                    // }
+                    nextTick(() => {
+                      combobox.comboboxNode.value?.focus();
+                      combobox.filterText.value = "";
+                    });
+                    // if (this.listboxHasVisualFocus) {
+                    //   this.setOption(this.getPreviousOption(this.option), true);
+                    // } else {
+                    //   this.open();
+                    //   if (!altKey) {
+                    //     this.setOption(this.lastOption, true);
+                    //     this.setVisualFocusListbox();
+                    //   }
+                    // }
+                  }
+                }
+                flag = true;
+                break;
+              case "Esc":
+              case "Escape":
+                console.log("LComboboxButton: press Esc, Escape");
+                if (combobox.isOpen.value) {
+                  combobox.close(e, true);
+                } else {
+                  combobox.model.value = [];
+                  combobox.filter.value = "";
+                  combobox.filterText.value = "";
+                }
+                // combobox.onFilterOptions(true);
+                flag = true;
+                break;
+              case "Tab":
+                console.log("LComboboxButton: press Tab");
+                combobox.close(e, true);
+                break;
+              case "Home":
+                console.log("LComboboxButton: press Home");
+                flag = true;
+                break;
+              case "End":
+                console.log("LComboboxButton: press End");
+                flag = true;
+                break;
+              default:
+                break;
+            }
+
+            if (flag) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }, []),
         },
         slots.default ? slots.default({}) : []
       );
@@ -693,42 +1233,6 @@ export const LComboboxOptions = defineComponent({
       return;
     }
 
-    // const aria = computed(() => {
-    //   const aria: HTMLAttributes = {};
-    //   if (combobox.option.value != null) {
-    //     aria[
-    //       "aria-activedescendant"
-    //     ] = `${combobox.option.value.id}-option-${combobox.focusOption.value}`;
-    //   }
-    //   if (select.field.value.multiple) {
-    //     aria["aria-multiselectable"] = true;
-    //   }
-    //   return aria;
-    // });
-
-    // const searchDebounce = ref<ReturnType<typeof setTimeout> | null>(null);
-
-    // const onSearch = (value: string) => {
-    //   if (!select.show.value) return;
-    //   if (value.length > 1) return;
-    //   select.searchQuery.value += value.toLowerCase();
-
-    //   const allOptions = select.field.value.keyFilter
-    //     ? select.filteredOptions.value
-    //     : select.field.value.items;
-
-    //   const indexFindElement = allOptions.findIndex((x) =>
-    //     x[select.field.value.keyValue]
-    //       .toLowerCase()
-    //       .startsWith(select.searchQuery.value)
-    //   );
-    //   // console.log('searchQuery=', sselect.searchQuery.value, indexFindElement)
-    //   if (indexFindElement !== -1) {
-    //     select.focusOption.value = indexFindElement;
-    //     select.optionsEl[indexFindElement].value.focus();
-    //   }
-    // };
-
     return () =>
       h(
         props.as,
@@ -742,93 +1246,11 @@ export const LComboboxOptions = defineComponent({
           onKeydown: withModifiers(
             (e: KeyboardEvent) => {
               console.log("LComboboxOptions: onKeyDown", e.key);
-              // if (searchDebounce.value) clearTimeout(searchDebounce.value);
-              // // onSearch(e.key);
-              // searchDebounce.value = setTimeout(
-              //   () => select.clearSearchQuery(),
-              //   350
-              // );
-
-              // // select all options
-              // if (e.ctrlKey && e.key === "a") {
-              //   toggleChooseAll();
-              //   e.preventDefault();
-              // }
-
-              // if (e.key === "Escape") {
-              //   select.focusOption.value = -1;
-              //   select.show.value = false;
-              //   select.selectButtonEl.value.focus({ preventScroll: true });
-              //   return;
-              // }
-
-              // change index active option.
-              // const newIndex = select.onChangeActiveIndex(e);
-              // e.preventDefault();
-              // if (newIndex !== select.focusOption.value) {
-              //   // set focus by index element from selected elements.
-              //   select.focusOption.value = newIndex;
-              //   // select.filteredOptions.value[newIndex]?.focus();
-              //   const keyValue = select.field.value.keyValue;
-              //   const value = select.filteredOptions.value[newIndex];
-              //   const elForFocus = select.optionsEl.value.find(
-              //     (x) => x.key == (keyValue ? value[keyValue] : value)
-              //   );
-              //   console.log(
-              //     "focus option = ",
-              //     newIndex,
-              //     select.optionsEl.value
-              //   );
-              //   if (elForFocus) {
-              //     //  && !select.searchEl.value
-              //     elForFocus.el?.focus();
-              //     // console.log("focus index option = ", newIndex, elForFocus.el);
-              //   } else {
-              //     // select.searchEl.value?.focus();
-              //   }
-              //   // select.optionsEl[newIndex].value?.focus();
-              // }
-              // if (!e.shiftKey) {
-              //   select.indexShiftFrom.value = newIndex;
-              // }
-
-              // if (
-              //   e.shiftKey &&
-              //   (e.key === "ArrowDown" || e.key === "ArrowUp")
-              // ) {
-              //   select.indexShiftTo.value = select.focusOption.value;
-              //   select.chooseItemsOfRange({
-              //     range: {
-              //       from: select.indexShiftFrom.value,
-              //       to: select.indexShiftTo.value,
-              //     },
-              //   });
-              //   // select.indexShiftFrom.value =
-              //   //   select.indexShiftFrom.value || select.focusOption.value
-              //   // console.group('onKeyDown')
-              //   // console.log(
-              //   //   'select.focusOption.value=',
-              //   //   select.focusOption.value
-              //   // )
-              //   // console.log('From =', select.indexShiftFrom.value)
-              //   // console.log('To =', select.indexShiftTo.value)
-              //   // console.groupEnd()
-              // }
             },
             ["stop"]
           ),
           onPointerup: () => {
             console.log("LComboboxOptions: onPointerup");
-            // if (
-            //   !this.comboboxNode.contains(event.target) &&
-            //   !this.listboxNode.contains(event.target) &&
-            //   !this.buttonNode.contains(event.target)
-            // ) {
-            //   this.comboboxHasVisualFocus = false;
-            //   this.setCurrentOptionStyle(null);
-            //   this.removeVisualFocusAll();
-            //   setTimeout(this.close.bind(this, true), 300);
-            // }
           },
           onPointerover: () => {
             console.log("LComboboxOptions: onPointerover");
@@ -837,110 +1259,13 @@ export const LComboboxOptions = defineComponent({
           onPointerout: () => {
             console.log("LComboboxOptions: onPointerout");
             combobox.hasHover.value = false;
-            // setTimeout(this.close.bind(this, false), 300);
           },
-          // onKeyup: (e: KeyboardEvent) => {
-          //   if (e.key === "Shift") {
-          //     select.pressShift.value = false;
-          //     select.indexShiftFrom.value = 0;
-          //     select.indexShiftTo.value = 0;
-          //   }
-          // },
-          // onFocus: () => {
-          //   console.log("LMultiSelectOptions: onFocus");
-          // },
         },
         slots.default
           ? slots.default({
               // groups: select?.groups.value,
               options: combobox.filteredOptions.value, // select.schema.value.items,
-            })
-          : []
-      );
-  },
-});
-
-export const LComboboxOptionsGroup = defineComponent({
-  name: "LComboboxOptionsGroup",
-  props: {
-    group: {
-      type: [String],
-      default: "default",
-      required: true,
-    },
-  },
-  setup(props, { slots }) {
-    const combobox = inject(ComboboxContext);
-    if (!combobox) {
-      return;
-    }
-
-    const id = useId();
-
-    const currentGroup = computed(() => combobox.groups.value[props.group]);
-
-    /**
-     * Choose group options
-     */
-    const chooseGroup = () => {
-      console.time("chooseGroup");
-      if (!select?.field.value.multiple) {
-        return;
-      }
-      const { length, selected } = currentGroup.value;
-      const allOptionsOfGroup = select.field.value.items
-        .filter((x) =>
-          select.groupkey ? x[select.groupkey] === props.group : true
-        )
-        .map((x) =>
-          select.field.value.keyValue ? x[select.field.value.keyValue] : x
-        );
-
-      const newValue =
-        length !== selected
-          ? select.model.value.concat(allOptionsOfGroup)
-          : select.model.value.filter((x) => allOptionsOfGroup.indexOf(x) < 0);
-      select.model.value = newValue;
-      console.timeEnd("chooseGroup");
-    };
-
-    /**
-     * options for current group
-     */
-    const options = computed(() => {
-      const allOptions = select.field.value.keyFilter
-        ? select.filteredOptions.value
-        : select.field.value.items;
-      return select.groupkey
-        ? allOptions.filter((x) => x[select.groupkey] === props.group)
-        : allOptions;
-    });
-
-    const groupSelect = computed(
-      () => currentGroup.value.selected === currentGroup.value.length
-    );
-
-    return () =>
-      h(
-        "div",
-        {
-          // ref: optionEl,
-          id: `${select?.id}-group-${id}`,
-          role: "group",
-          "aria-disabled": false,
-          // tabindex: -1, // disabled === true ? undefined : -1,
-          // 'aria-selected': false,
-          onClick: withModifiers(() => {
-            chooseGroup();
-          }, ["stop"]),
-        },
-        slots.default
-          ? slots.default({
-              groupId: id,
-              options: options.value,
-              groupSelectedOption: currentGroup.value.selected,
-              groupLength: currentGroup.value.length,
-              groupSelect: groupSelect.value,
+              hasOptions: combobox.hasOptions.value,
             })
           : []
       );
@@ -968,14 +1293,14 @@ export const LComboboxOption = defineComponent({
       return;
     }
 
-    const currentOption = ref(null);
-    const key = computed(() =>
+    const currentOption = ref<HTMLElement | null>(null);
+
+    const id = useId();
+    const indexKey = computed(() =>
       combobox.field.value.keyValue && typeof props.value == "object"
         ? props.value[combobox.field.value.keyValue]
         : props.value
     );
-
-    const id = useId();
 
     const selected = computed(() => {
       // console.log('computed check')
@@ -1008,9 +1333,20 @@ export const LComboboxOption = defineComponent({
 
     onMounted(() => {
       combobox.allOptions.value.push({
-        key: key.value,
+        index: indexKey.value,
+        key: `${combobox.field.value.id}-option-${id}`,
         el: currentOption.value,
       });
+    });
+
+    const index = computed(() =>
+      combobox?.allOptions.value.findIndex((x) => x.key == indexKey.value)
+    );
+
+    onUnmounted(() => {
+      // console.log("remove key=", index);
+      // delete select.optionsElement.value[key.value];
+      combobox?.allOptions.value.splice(index.value, 1);
     });
 
     return () =>
@@ -1027,6 +1363,17 @@ export const LComboboxOption = defineComponent({
           onKeydown: withModifiers(
             (e: KeyboardEvent) => {
               console.log("LComboboxOption: onKeyDown", e.key);
+              // switch (e.key) {
+              //   case "Enter":
+              //     console.log("LComboboxOption: press Enter");
+              //     combobox.onChooseOption(props.value);
+              //     // if (this.listboxHasVisualFocus) {
+              //     //   this.setValue(this.option.textContent);
+              //     // }
+              //     // this.close(true);
+              //     // this.setVisualFocusCombobox();
+              //     break;
+              // }
               // if (searchDebounce.value) clearTimeout(searchDebounce.value);
               // // onSearch(e.key);
               // searchDebounce.value = setTimeout(
@@ -1124,9 +1471,23 @@ export const LComboboxOption = defineComponent({
             combobox.hasHover.value = false;
             // setTimeout(this.close.bind(this, false), 300);
           },
-          onClick: withModifiers(() => {
-            combobox.onChooseOption(props.value);
-          }, ["stop"]),
+          onClick: withModifiers(
+            (e: MouseEvent) => {
+              combobox.onChooseOption(props.value);
+
+              combobox.onSetValue();
+              if (!combobox.field.value?.multiple) {
+                combobox.close(e, true);
+              }
+              if (!combobox.isNone) {
+                combobox.onFilterOptions(true);
+              }
+              nextTick(() => {
+                combobox.comboboxNode.value?.focus();
+              });
+            },
+            ["stop"]
+          ),
           // onKeyup: (e: KeyboardEvent) => {
           //   if (e.key === "Shift") {
           //     select.pressShift.value = false;
@@ -1143,7 +1504,9 @@ export const LComboboxOption = defineComponent({
               selected: selected.value,
               hovered: hovered.value,
             })
-          : []
+          : combobox.field.value.keyValue && typeof props.value == "object"
+          ? props.value[combobox.field.value.keyValue]
+          : props.value
       );
   },
 });

@@ -67,11 +67,11 @@ const onReset = () => {
         class="mr-2 h-5 w-5 appearance-none outline-none group focus:ring-2 focus:ring-offset-2 border rounded-md focus:ring-offset-white dark:focus:ring-offset-s-800 checked:bg-p-500"
         :class="[
           {
-            'border-d-500 dark:border-d-500 focus:ring-d-500 focus:border-d-500 ':
+            'border-d-500 dark:border-d-500 focus:ring-d-500 focus:border-d-500 hover:ring-d-500':
               error,
           },
           {
-            'border-s-200 dark:border-s-600 focus:ring-p-500 focus:border-p-500':
+            'border-s-200 dark:border-s-600 focus:ring-p-500 focus:border-p-500 hover:ring-p-500 hover:border-p-500':
               !error,
           },
         ]"

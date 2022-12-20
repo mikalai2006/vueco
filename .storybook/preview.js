@@ -51,7 +51,8 @@ export const decorators = [
         };
       },
       components: { story },
-      template: '<div :class="[theme]"><div class="app"><story /></div></div>',
+      template:
+        '<div :class="[theme]"><div class="app"><div class="bg-white dark:bg-s-900 min-h-screen w-full"><story /></div></div></div>',
     };
   },
 ];

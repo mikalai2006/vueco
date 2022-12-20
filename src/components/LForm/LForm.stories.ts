@@ -13,6 +13,7 @@ import FTextarea from "@/components/ui/FTextarea.vue";
 import FCheckbox from "@/components/ui/FCheckbox.vue";
 import FNumber from "@/components/ui/FNumber.vue";
 import FMultiSelect from "@/components/ui/FMultiSelect.vue";
+import FCombobox from "@/components/ui/FCombobox.vue";
 
 import LBtn from "@/components/LBtn";
 
@@ -56,14 +57,43 @@ const formData = [
     ],
   },
   {
+    autocomplete: "both",
+    id: "group",
+    name: "group",
+    keyValue: "id",
+    keyLabel: "id",
+    keyFilter: "title",
+    // keyGroup: "group",
+    // group: "custom info",
+    // autofocus: true,
+    // multiple: true,
+    after: true,
+    component: "FCombobox",
+    label: "Your group",
+    description: "Choose group your know",
+    placeholder: "Choose group",
+    items: [
+      { id: "one", group: "group1", title: "one item" },
+      { id: "two", group: "group2", title: "two item" },
+      { id: "three", group: "group1", title: "three item" },
+    ],
+    vtype: "string",
+    rules: [
+      {
+        type: "required",
+        params: [],
+      },
+    ],
+  },
+  {
     id: "categories",
     name: "categories",
+    autocomplete: "both",
     after: true,
-    keyValue: "_id",
+    keyValue: "title",
     keyLabel: "title",
-    // keyGroup: 'parentId',
-    // keyFilter: "title",
-    component: "FMultiSelect",
+    keyFilter: "title",
+    component: "FCombobox",
     label: "Your categories",
     description: "Input category your know",
     placeholder: "Choose categories",
@@ -361,6 +391,7 @@ export const Default = () => ({
     FCheckbox,
     FNumber,
     FMultiSelect,
+    FCombobox,
 
     LBtn,
   },
@@ -382,7 +413,9 @@ export const Default = () => ({
       await onFormValidate(forms.value);
 
       if (isValidForm.value) {
-        console.log("Save form!");
+        console.group("Save form");
+        console.log(forms.value);
+        console.groupEnd();
       }
     };
 
@@ -413,7 +446,7 @@ export const Default = () => ({
     };
   },
   template: `
-  <div class="py-16">
+  <div class="py-16 bg-s-200 dark:bg-s-900">
       <LForm
         v-model="forms"
         :schema="formData"
@@ -451,7 +484,7 @@ export const Default = () => ({
                 <LFormFieldDescription
                   v-if="field.description"
                   :field="field"
-                  class="mt-2 text-sm leading-none text-s-500 dark:text-s-400"
+                  class="mt-2 text-sm leading-none text-s-600 dark:text-s-400"
                 >
                   {{ field.description }}
                 </LFormFieldDescription>

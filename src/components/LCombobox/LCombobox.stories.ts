@@ -1,4 +1,6 @@
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
+
+import vitestResults from "@/unit-test-results.json";
 
 import FCombobox from "@/components/ui/FCombobox.vue";
 import FText from "@/components/ui/FText.vue";
@@ -9,6 +11,12 @@ import FError from "@/components/ui/FError.vue";
 export default {
   title: "Components/FCombobox",
   component: FCombobox,
+  parameters: {
+    vitest: {
+      testFile: "FCombobox.spec.ts",
+      testResults: vitestResults,
+    },
+  },
 };
 
 import {
@@ -19,15 +27,16 @@ import {
 } from "@/stories/composable/useIcon";
 
 const schema = {
+  autocomplete: "both",
   id: "friends",
   name: "friends",
   component: "FCombobox",
-  keyValue: "id", // ключ для свойства
+  keyValue: "name", // ключ для свойства
   keyLabel: "name",
   // keyGroup: 'parentId', // ключ для группировки
   keyFilter: "name",
   autofocus: true,
-  // multiple: true,
+  multiple: true,
   label: "Your friends",
   description: "Choose friends your know",
   placeholder: "Choose friends",
@@ -62,8 +71,8 @@ const Default = (args: any) => ({
     const error = ref(args.error);
     const required = ref(args.required);
 
-    const onLoadItems = async (params) => {
-      console.log("onLoadItems: ", params);
+    const onLoadItems = async () => {
+      // console.log("onLoadItems: ", params);
 
       /**
        * fetch items for options
@@ -104,8 +113,8 @@ const Default = (args: any) => ({
     };
   },
   template: `
-  <div class="py-16 bg-s-200 dark:bg-s-900">
-    <div class="max-w-lg mx-auto p-4 rounded-md bg-white dark:bg-s-800 shadow-xl">
+  <div class="py-16">
+    <div class="max-w-lg mx-auto p-4 rounded-md bg-s-100 dark:bg-s-800 shadow-xl">
       <FCombobox
         v-model="selectModel"
         :field="field"
@@ -148,7 +157,7 @@ const Default = (args: any) => ({
 
 export const Combobox: any = Default.bind({});
 Combobox.args = {
-  modelValue: "",
+  modelValue: [],
   field: schema,
   error: "",
   required: true,

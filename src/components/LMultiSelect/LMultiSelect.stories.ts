@@ -25,7 +25,7 @@ const schemaMultiSelect = {
   keyValue: "id", // ключ для свойства
   keyLabel: "name",
   // keyGroup: 'parentId', // ключ для группировки
-  keyFilter: "name",
+  // keyFilter: "name",
   autofocus: true,
   multiple: true,
   label: "Your friends",
@@ -104,7 +104,7 @@ const Default = (args: any) => ({
     };
   },
   template: `
-  <div class="py-16 bg-s-200 dark:bg-s-900">
+  <div class="min-h-screen py-16 bg-s-200 dark:bg-s-900">
     <div class="max-w-lg mx-auto p-4 rounded-md bg-white dark:bg-s-800 shadow-xl">
       <FMultiSelect
         :is="field.component"

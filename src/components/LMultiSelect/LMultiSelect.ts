@@ -360,7 +360,7 @@ export const LMultiSelect = defineComponent({
       }
 
       console.log("onChangeActiveIndex: newIndex=", newIndex);
-      select.focusOption.value = newIndex;
+      // select.focusOption.value = newIndex;
       return newIndex;
     };
 
@@ -484,12 +484,15 @@ export const LMultiSelect = defineComponent({
 
     onMounted(async () => {
       await loadData();
-      nextTick(() => {
-        if (field.value.autofocus) {
-          selectButtonEl.value?.focus();
-          // selectButtonEl.value.click()
-        }
-      });
+      if (field.value.autofocus) {
+        nextTick(() => {
+          if (select.searchEl.value) {
+            select.searchEl.value.focus();
+          } else {
+            selectButtonEl.value?.focus();
+          }
+        });
+      }
     });
 
     return () =>

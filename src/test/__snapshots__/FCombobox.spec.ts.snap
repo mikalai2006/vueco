@@ -1,0 +1,228 @@
+// Vitest Snapshot v1
+
+exports[`Combobox with autocomplete > LCombobox filter 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"true\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <div class=\\"p-2\\">None options</div>
+  </ul>
+</div>"
+`;
+
+exports[`Combobox with autocomplete > LCombobox input render 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"true\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"friends-option-4\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <li id=\\"friends-option-4\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">One</li>
+    <li id=\\"friends-option-5\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">Two</li>
+    <li id=\\"friends-option-6\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">Three</li>
+  </ul>
+</div>"
+`;
+
+exports[`Combobox with autocomplete > LCombobox render 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <div class=\\"p-2\\">None options</div>
+  </ul>
+</div>"
+`;
+
+exports[`Combobox with autocomplete > should be render with default 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <div class=\\"p-2\\">None options</div>
+  </ul>
+</div>"
+`;
+
+exports[`Combobox with autocomplete > should be render with default options 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <div class=\\"p-2\\">None options</div>
+  </ul>
+</div>"
+`;
+
+exports[`FCombobox > renders properly 1`] = `
+"<div class=\\"flex items-center cursor-pointer rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500 hover:ring-p-500 hover:border-p-500\\">
+  <div showlist=\\"false\\" class=\\"relative flex-auto\\">
+    <div class=\\"outline-none flex space-x-2 items-center w-full transition\\">
+      <div class=\\"flex-auto flex flex-wrap m-1\\"><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\" autocomplete=\\"off\\" class=\\"w-full px-2 py-1 cursor-text outline-none bg-transparent\\"></div>
+      <div class=\\"py-2 pr-2\\"><svg class=\\"fill-current transition-transform\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 16 16\\">
+          <path d=\\"M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\\"></path>
+        </svg></div>
+    </div>
+    <div class=\\"z-10 mt-1.5 transition overflow-hidden shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800 hidden border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500\\" style=\\"display: none;\\">
+      <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\" class=\\"max-h-64 b-scroll overflow-y-auto\\">
+        <div class=\\"p-2\\">None options</div><!-- </LComboboxOptionsGroup> -->
+      </ul>
+    </div>
+    <!-- <pre>
+        {{ combobox.isList }} |
+        {{ combobox.isBoth }} |
+        {{ combobox.isNone }} |
+        {{ combobox.filter }} |
+        {{ combobox.filterText }} |
+        {{ combobox.focusOption }} |
+        {{ model }}
+      </pre> -->
+  </div>
+</div>"
+`;
+
+exports[`FCombobox a11y > autocomplete both 1`] = `
+"<div class=\\"flex items-center cursor-pointer rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500 hover:ring-p-500 hover:border-p-500\\">
+  <div showlist=\\"false\\" class=\\"relative flex-auto\\">
+    <div class=\\"outline-none flex space-x-2 items-center w-full transition\\">
+      <div class=\\"flex-auto flex flex-wrap m-1\\"><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\" autocomplete=\\"off\\" class=\\"w-full px-2 py-1 cursor-text outline-none bg-transparent\\"></div>
+      <div class=\\"py-2 pr-2\\"><svg class=\\"fill-current transition-transform\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 16 16\\">
+          <path d=\\"M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\\"></path>
+        </svg></div>
+    </div>
+    <div class=\\"z-10 mt-1.5 transition overflow-hidden shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800 hidden border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500\\" style=\\"display: none;\\">
+      <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\" class=\\"max-h-64 b-scroll overflow-y-auto\\">
+        <div class=\\"p-2\\">None options</div><!-- </LComboboxOptionsGroup> -->
+      </ul>
+    </div>
+    <!-- <pre>
+        {{ combobox.isList }} |
+        {{ combobox.isBoth }} |
+        {{ combobox.isNone }} |
+        {{ combobox.filter }} |
+        {{ combobox.filterText }} |
+        {{ combobox.focusOption }} |
+        {{ model }}
+      </pre> -->
+  </div>
+</div>"
+`;
+
+exports[`FCombobox a11y > autocomplete none 1`] = `
+"<div class=\\"flex items-center cursor-pointer rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500 hover:ring-p-500 hover:border-p-500\\">
+  <div showlist=\\"false\\" class=\\"relative flex-auto\\">
+    <div class=\\"outline-none flex space-x-2 items-center w-full transition\\">
+      <div class=\\"flex-auto flex flex-wrap m-1\\">
+        <div id=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\" autocomplete=\\"off\\" class=\\"w-full px-2 py-1 outline-none bg-transparent\\">
+          <div>Choose friends</div>
+        </div>
+      </div>
+      <div class=\\"py-2 pr-2\\"><svg class=\\"fill-current transition-transform\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 16 16\\">
+          <path d=\\"M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\\"></path>
+        </svg></div>
+    </div>
+    <div class=\\"z-10 mt-1.5 transition overflow-hidden shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800 hidden border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500\\" style=\\"display: none;\\">
+      <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\" class=\\"max-h-64 b-scroll overflow-y-auto\\">
+        <div class=\\"p-2\\">None options</div><!-- </LComboboxOptionsGroup> -->
+      </ul>
+    </div>
+    <!-- <pre>
+        {{ combobox.isList }} |
+        {{ combobox.isBoth }} |
+        {{ combobox.isNone }} |
+        {{ combobox.filter }} |
+        {{ combobox.filterText }} |
+        {{ combobox.focusOption }} |
+        {{ model }}
+      </pre> -->
+  </div>
+</div>"
+`;
+
+exports[`FCombobox a11y > role=listbox 1`] = `
+"<div class=\\"flex items-center cursor-pointer rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500 hover:ring-p-500 hover:border-p-500\\">
+  <div showlist=\\"false\\" class=\\"relative flex-auto\\">
+    <div class=\\"outline-none flex space-x-2 items-center w-full transition\\">
+      <div class=\\"flex-auto flex flex-wrap m-1\\"><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\" autocomplete=\\"off\\" class=\\"w-full px-2 py-1 cursor-text outline-none bg-transparent\\"></div>
+      <div class=\\"py-2 pr-2\\"><svg class=\\"fill-current transition-transform\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 16 16\\">
+          <path d=\\"M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\\"></path>
+        </svg></div>
+    </div>
+    <div class=\\"z-10 mt-1.5 transition overflow-hidden shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800 hidden border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500\\" style=\\"display: none;\\">
+      <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\" class=\\"max-h-64 b-scroll overflow-y-auto\\">
+        <div class=\\"p-2\\">None options</div><!-- </LComboboxOptionsGroup> -->
+      </ul>
+    </div>
+    <!-- <pre>
+        {{ combobox.isList }} |
+        {{ combobox.isBoth }} |
+        {{ combobox.isNone }} |
+        {{ combobox.filter }} |
+        {{ combobox.filterText }} |
+        {{ combobox.focusOption }} |
+        {{ model }}
+      </pre> -->
+  </div>
+</div>"
+`;
+
+exports[`FCombobox a11y > test aria-activedescendant(last) 1`] = `
+"<div class=\\"flex items-center cursor-pointer rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500 hover:ring-p-500 hover:border-p-500\\">
+  <div showlist=\\"false\\" class=\\"relative flex-auto\\">
+    <div class=\\"outline-none flex space-x-2 items-center w-full transition\\">
+      <div class=\\"flex-auto flex flex-wrap m-1\\"><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"true\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"friends-option-27\\" autocomplete=\\"off\\" class=\\"w-full px-2 py-1 cursor-text outline-none bg-transparent\\"></div>
+      <div class=\\"py-2 pr-2\\"><svg class=\\"fill-current transition-transform rotate-180\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 16 16\\">
+          <path d=\\"M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\\"></path>
+        </svg></div>
+    </div>
+    <div class=\\"z-10 mt-1.5 transition overflow-hidden shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800 block border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500\\" style=\\"\\">
+      <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\" class=\\"max-h-64 b-scroll overflow-y-auto\\">
+        <li id=\\"friends-option-25\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">
+          <div class=\\"flex p-2 items-center cursor-pointer focus:outline-none bg-transparent text-black dark:text-white group-focus:bg-p-100 group-hover:bg-p-100 dark:group-hover:bg-p-900 dark:group-focus:bg-p-900\\">
+            <div class=\\"flex items-center h-6 w-6 mr-2\\">
+              <!--v-if-->
+            </div> One | false |
+          </div>
+        </li>
+        <li id=\\"friends-option-26\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">
+          <div class=\\"flex p-2 items-center cursor-pointer focus:outline-none bg-transparent text-black dark:text-white group-focus:bg-p-100 group-hover:bg-p-100 dark:group-hover:bg-p-900 dark:group-focus:bg-p-900\\">
+            <div class=\\"flex items-center h-6 w-6 mr-2\\">
+              <!--v-if-->
+            </div> Two | false |
+          </div>
+        </li>
+        <li id=\\"friends-option-27\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">
+          <div class=\\"flex p-2 items-center cursor-pointer focus:outline-none bg-p-200 dark:bg-p-800 text-black dark:text-white group-focus:bg-p-200 group-hover:bg-p-200 dark:group-hover:bg-p-800 dark:group-focus:bg-p-800\\">
+            <div class=\\"flex items-center h-6 w-6 mr-2\\">
+              <!--v-if-->
+            </div> Three | true |
+          </div>
+        </li><!-- </LComboboxOptionsGroup> -->
+      </ul>
+    </div>
+    <!-- <pre>
+        {{ combobox.isList }} |
+        {{ combobox.isBoth }} |
+        {{ combobox.isNone }} |
+        {{ combobox.filter }} |
+        {{ combobox.filterText }} |
+        {{ combobox.focusOption }} |
+        {{ model }}
+      </pre> -->
+  </div>
+</div>"
+`;
+
+exports[`LCombobox > LCombobox filter 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"true\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <div class=\\"p-2\\">None options</div>
+  </ul>
+</div>"
+`;
+
+exports[`LCombobox > LCombobox input render 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"true\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"friends-option-4\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <li id=\\"friends-option-4\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">One</li>
+    <li id=\\"friends-option-5\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">Two</li>
+    <li id=\\"friends-option-6\\" role=\\"option\\" aria-disabled=\\"false\\" tabindex=\\"-1\\" class=\\"group relative overflow-hidden\\">Three</li>
+  </ul>
+</div>"
+`;
+
+exports[`LCombobox > LCombobox render 1`] = `
+"<div><input id=\\"friends\\" type=\\"text\\" name=\\"friends\\" role=\\"combobox\\" tabindex=\\"0\\" placeholder=\\"Choose friends\\" aria-autocomplete=\\"both\\" aria-expanded=\\"false\\" aria-controls=\\"friends-listbox\\" aria-activedescendant=\\"\\">
+  <ul id=\\"friends-listbox\\" role=\\"listbox\\" aria-labelledby=\\"friends-button\\">
+    <div class=\\"p-2\\">None options</div>
+  </ul>
+</div>"
+`;

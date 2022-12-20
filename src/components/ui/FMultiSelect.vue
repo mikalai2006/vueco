@@ -20,7 +20,11 @@ import {
   LMultiSelectOption,
 } from "@/components/LMultiSelect";
 
-import { iChevronDown, iCheck, iClose } from "@/stories/composable/useIcon";
+import {
+  iChevronDown,
+  iCheck,
+  // iClose
+} from "@/stories/composable/useIcon";
 
 import { LSpinner } from "@/components/LSpinner";
 import { LIcon } from "@/components/LIcon";
@@ -106,14 +110,14 @@ const showList = ref(false);
   <div
     class="flex items-center"
     :class="[
-      'rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent',
+      'rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1  bg-white dark:bg-s-900',
       {
-        'border-d-500 dark:border-d-500 focus-within:ring-d-500 focus-within:border-d-500':
+        'border-d-500 dark:border-d-500 focus-within:ring-d-500 focus-within:border-d-500 hover:ring-d-500':
           error,
       },
       showList ? '' : '',
       {
-        'border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500':
+        'border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500  hover:ring-p-500 hover:border-p-500':
           !error,
       },
     ]"
@@ -169,7 +173,7 @@ const showList = ref(false);
               field.keyFilter &&
               ((!selectedOptions.length && !field.multiple) || field.multiple)
             "
-            class="px-2 py-1 cursor-text outline-none bg-transparent"
+            class="px-2 py-1 cursor-text outline-none bg-transparent placeholder-s-400"
           >
           </LMultiSelectSearch>
           <div
@@ -292,8 +296,6 @@ const showList = ref(false);
                       alt=""
                     /> -->
                     {{ field.keyLabel ? option[field.keyLabel] : option }}
-                    |
-                    {{ hovered }}
                   </div>
                 </slot>
               </LMultiSelectOption>

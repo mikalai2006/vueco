@@ -5,7 +5,7 @@ export * from "./components/LForm";
 export * from "./components/LInput";
 export * from "./components/LMultiSelect";
 
-// export * from "./components/ui";
+export * from "./components/ui";
 // import Hello from './components/Hello'
 // import Btn from './components/Btn'
 // export * from './components/LBtn'

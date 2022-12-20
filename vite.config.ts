@@ -14,6 +14,11 @@ export const ssrTransformCustomDir = () => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  test: {
+    coverage: {
+      provider: "istanbul", // or 'c8'
+    },
+  },
   plugins: [
     vue({
       template: {

@@ -63,13 +63,13 @@ const onReset = () => {
   <div
     class="flex items-center"
     :class="[
-      'rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-transparent',
+      'rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 bg-white dark:bg-s-900',
       {
-        'border-d-500 dark:border-d-500 focus-within:ring-d-500 focus-within:border-d-500':
+        'border-d-500 dark:border-d-500 focus-within:ring-d-500 focus-within:border-d-500 hover:ring-d-500':
           error,
       },
       {
-        'border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500':
+        'border-s-200 dark:border-s-600 focus-within:ring-p-500 focus-within:border-p-500 hover:ring-p-500 hover:border-p-500':
           !error,
       },
     ]"
@@ -81,7 +81,7 @@ const onReset = () => {
       v-model="model"
       :field="field"
       :error="error"
-      class="outline-none px-4 py-2 bg-transparent w-full"
+      class="outline-none px-4 py-2 bg-transparent w-full placeholder-s-400"
       @input="$emit('on-input')"
     />
     <slot name="after" :onReset="onReset"></slot>
