@@ -1,0 +1,2 @@
+import{d as e,o as a,e as n,f as t,j as o,u as s}from"./vue.esm-bundler.a08ba302.js";import{L as r}from"./LIcon.ca56402e.js";const c=e({__name:"FSpinner",setup(p){return(i,_)=>(a(),n(s(r),{class:"animate-spin"},{default:t(()=>[o(" M8 3a5 5 0 1 0 4.5 2.9.5.5 0 0 1 .9-.4A6 6 0 1 1 8 2v1z M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z ")]),_:1}))}});c.__docgenInfo={exportName:"default",displayName:"FSpinner",description:"",tags:{}};export{c as _};
+//# sourceMappingURL=FSpinner.02b7571f.js.map
