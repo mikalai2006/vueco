@@ -47,6 +47,8 @@ const onSetFocus = () => {
   if (el && el?.input) el?.input.focus();
 };
 
+const empty = computed(() => model.value != false && model.value != true);
+
 const onReset = () => {
   model.value = false;
   emit("on-input");
@@ -94,7 +96,7 @@ const onReset = () => {
         :required="required"
         :onSetFocus="onSetFocus"
       ></slot>
-      <slot name="after" :onReset="onReset"></slot>
+      <slot name="after" :onReset="onReset" :empty="empty"></slot>
       <slot name="error"></slot>
       <slot name="description"></slot>
     </div>

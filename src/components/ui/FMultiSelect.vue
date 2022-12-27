@@ -23,6 +23,7 @@ import {
 import {
   iChevronDown,
   iCheck,
+  iDash,
   // iClose
 } from "@/stories/composable/useIcon";
 
@@ -130,7 +131,7 @@ const showList = ref(false);
       :field="field"
       :error="error"
       class="relative flex-auto"
-      #default="{ select, show, loading, disabled, selectedOptions }"
+      #default="{ show, loading, selectedOptions }"
       @on-load-items="$emit('on-load-items')"
       @on-input="$emit('on-input')"
     >
@@ -197,7 +198,7 @@ const showList = ref(false);
         <slot name="after" :on-reset="onReset" :empty="empty"></slot>
       </div>
       <div
-        class="z-10 mt-1.5 transition overflow-hidden shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800"
+        class="z-10 mt-1.5 transition shadow-2xl outline-none border border-s-200 dark:border-s-700 rounded-md absolute top-full left-0 right-0 bg-white dark:bg-s-800"
         :class="[
           show ? 'block' : 'hidden',
           error ? '' : '',
@@ -232,40 +233,58 @@ const showList = ref(false);
         <div v-if="error" class="p-2">
           <slot name="error" :error="error"></slot>
         </div>
-        <div
-          class="shadow-inner overflow-hidden max-h-64 b-scroll overflow-y-auto"
-        >
+        <div class="shadow-inner max-h-64 b-scroll overflow-y-auto">
           <LMultiSelectOptions #default="{ groups }">
             <LMultiSelectGroup
               v-for="group in groups"
               :key="group.key"
               :group="group.key"
-              #default="{ options }"
+              #default="{ options, groupSelectedOption, groupLength }"
             >
-              <div v-if="group.key !== 'default'">
+              <div
+                v-if="group.key !== 'default'"
+                class="flex p-2 font-bold cursor-pointer bg-s-100 dark:bg-s-900"
+              >
+                <div
+                  :class="[
+                    'flex items-center border rounded-md h-6 w-6 mr-2 border-s-200 dark:border-s-700 text-xl text-p-500',
+                  ]"
+                >
+                  <LIcon v-if="groupSelectedOption == groupLength">
+                    {{ iCheck }}
+                  </LIcon>
+
+                  <LIcon
+                    v-if="
+                      groupSelectedOption < groupLength &&
+                      groupSelectedOption != 0
+                    "
+                  >
+                    {{ iDash }}
+                  </LIcon>
+                </div>
                 {{ group.key }}
               </div>
               <LMultiSelectOption
-                v-for="(option, index) of options"
-                :key="option[field.keyValue] || option"
+                v-for="option of options"
+                :key="field.keyValue ? option[field.keyValue] : option"
                 :value="option"
-                class="group relative overflow-hidden"
-                #default="{ selected, focused, hovered }"
+                class="group relative overflow-hidden focus:outline-none cursor-pointer"
+                #default="{ selected, hovered }"
               >
-                <slot name="option" :option="option" :selected="selected">
+                <slot
+                  name="option"
+                  :option="option"
+                  :selected="selected"
+                  :hovered="hovered"
+                >
                   <div
                     v-ripple="{}"
                     :class="[
                       'flex p-2 items-center cursor-pointer focus:outline-none',
-                      selected
-                        ? hovered
-                          ? 'bg-p-200 dark:bg-p-800 '
-                          : 'bg-p-100 dark:bg-p-900 ' +
-                            ' text-black dark:text-white group-focus:bg-p-200 group-hover:bg-p-200 dark:group-hover:bg-p-800 dark:group-focus:bg-p-800'
-                        : hovered
-                        ? 'bg-s-100  dark:bg-s-900 '
-                        : 'bg-transparent' +
-                          ' text-black dark:text-white group-focus:bg-s-100 group-hover:bg-s-100 dark:group-hover:bg-s-900 dark:group-focus:bg-s-900',
+                      hovered
+                        ? 'bg-p-200 dark:bg-p-800 text-black dark:text-white group-focus:bg-p-200 group-hover:bg-p-200 dark:group-hover:bg-p-800 dark:group-focus:bg-p-800'
+                        : 'bg-transparent text-black dark:text-white group-focus:bg-p-100 group-hover:bg-p-100 dark:group-hover:bg-p-900 dark:group-focus:bg-p-900',
                     ]"
                   >
                     <div
@@ -281,7 +300,7 @@ const showList = ref(false);
                         :class="[
                           'text-xl',
                           {
-                            'text-s-500 dark:text-white': selected,
+                            'text-p-500 dark:text-p-500': selected,
                           },
                         ]"
                       >
@@ -303,9 +322,9 @@ const showList = ref(false);
           </LMultiSelectOptions>
         </div>
       </div>
-      <pre>
+      <!-- <pre>
         {{ select.focusOption }}
-      </pre>
+      </pre> -->
     </LMultiSelect>
   </div>
   <slot name="error" :error="error"></slot>

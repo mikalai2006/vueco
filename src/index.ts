@@ -1,11 +1,18 @@
+export * from "./components/LCombobox";
 export * from "./components/LSpinner";
 export * from "./components/LIcon";
 export * from "./components/LBtn";
 export * from "./components/LForm";
 export * from "./components/LInput";
 export * from "./components/LMultiSelect";
+export * from "./components/LMenu";
+export * from "./components/LTabs";
 
 export * from "./components/ui";
+
+export * from "./directives/ripple";
+export * from "./directives/autofocus";
+
 // import Hello from './components/Hello'
 // import Btn from './components/Btn'
 // export * from './components/LBtn'

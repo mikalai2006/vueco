@@ -44,7 +44,13 @@ const model = computed({
 <template>
   <LTabs v-model="model" manual class="mt-2 bg-white dark:bg-s-700">
     <LTabsList class="flex space-x-1">
-      <LTab v-for="tab in tabs" :key="tab" :tab="tab" v-slot="{ selected }">
+      <LTab
+        v-for="tab in tabs"
+        :key="tab"
+        :tab="tab"
+        as="template"
+        v-slot="{ selected }"
+      >
         <button
           type="button"
           :class="[

@@ -32,7 +32,7 @@ export interface ErrorValidate {
 
 export type TItem = {
   id: string | number;
-  name: string;
+  name?: string;
   [key: string]: any;
 };
 
@@ -42,10 +42,11 @@ export type IField = {
   autofocus?: boolean;
   co?: string;
   component?: string;
+  custom?: boolean;
   description?: string;
   disabled?: boolean;
   id: string | number;
-  items?: Array<TItem | string | number>;
+  items?: Array<TItem | string | number | { [key: string]: any }>;
   group?: string;
   keyLabel?: string;
   keyValue?: string;

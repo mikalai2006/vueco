@@ -19,12 +19,7 @@ export default {
   },
 };
 
-import {
-  iChevronDown,
-  iCheck,
-  iClose,
-  iFunnel,
-} from "@/stories/composable/useIcon";
+import { iChevronDown, iCheck, iClose } from "@/stories/composable/useIcon";
 
 const schema = {
   autocomplete: "both",
@@ -109,7 +104,6 @@ const Default = (args: any) => ({
       iChevronDown,
       iCheck,
       iClose,
-      iFunnel,
     };
   },
   template: `
@@ -141,7 +135,6 @@ const Default = (args: any) => ({
           <LFormFieldLabel
             v-if="field.label"
             :field="field"
-            :required="required"
             class="flex-none block font-medium mb-1"
             @onSetFocus="onSetFocus"
           >

@@ -254,18 +254,28 @@ export const LMultiSelect = defineComponent({
         };
       }
       if (groupkey) {
-        field.value.items?.forEach((x) => {
-          // console.log(x[select.groupkey])
-          if (typeof x == "object") {
-            groups[x[groupkey]] = {
-              selected: selectedOptions.value.filter(
-                (y) => typeof y == "object" && y[groupkey] == x[groupkey]
-              ).length,
-              length: groups[x[groupkey]] ? groups[x[groupkey]].length + 1 : 1,
-              key: x[groupkey],
-            };
-          }
-        });
+        filteredOptions.value
+          .sort((a, b) =>
+            typeof a[groupkey] == "string"
+              ? a[groupkey].localeCompare(b[groupkey])
+              : a - b
+          )
+          ?.forEach((x) => {
+            // console.log(x[select.groupkey])
+            let _group =
+              typeof x[groupkey] == "string"
+                ? x[groupkey]
+                : x[groupkey].toString();
+            if (typeof x == "object") {
+              groups[_group] = {
+                selected: selectedOptions.value.filter(
+                  (y) => typeof y == "object" && y[groupkey] == _group
+                ).length,
+                length: groups[_group] ? groups[_group].length + 1 : 1,
+                key: _group,
+              };
+            }
+          });
       }
       console.timeEnd("groupscomputed");
       console.log("groups=", groups);
@@ -550,7 +560,7 @@ export const LMultiSelectButton = defineComponent({
             tabindex: 0,
             disabled: select.disabled.value,
             "aria-expanded": select.show.value,
-            "aria-haspopup": true,
+            "aria-haspopup": "listbox",
             "aria-labelledby": select.field.value.label
               ? `${select.field.value.name}_label`
               : undefined,
@@ -608,7 +618,13 @@ export const LMultiSelectButton = defineComponent({
                 );
                 if (!select.field.value.multiple) {
                   nextTick(() => {
-                    select.selectButtonEl.value?.focus({ preventScroll: true });
+                    if (select.searchEl.value) {
+                      select.searchEl.value?.focus();
+                    } else {
+                      select.selectButtonEl.value?.focus({
+                        preventScroll: true,
+                      });
+                    }
                     select.show.value = false;
                   });
                   // e.stopPropagation();
@@ -617,6 +633,8 @@ export const LMultiSelectButton = defineComponent({
                 break;
               case "ArrowUp":
               case "ArrowDown":
+                console.log("Key press down");
+
                 if (!select.show.value) {
                   select.show.value = true;
                   // console.log(`select ${select.focusOption.value}`)
@@ -625,8 +643,9 @@ export const LMultiSelectButton = defineComponent({
                 if (select.show.value) {
                   select.onChangeActiveIndex(e);
                 }
-                select.onSetFocus();
-
+                nextTick(() => {
+                  select.onSetFocus();
+                });
                 // nextTick(() => {
                 //   console.log("focus listBoxEl");
                 //   select.listBoxEl.value?.focus({ preventScroll: true });
@@ -636,16 +655,14 @@ export const LMultiSelectButton = defineComponent({
                 // });
 
                 // set focus input element.
-                if (select.searchEl.value) {
-                  nextTick(() => {
-                    select.searchEl.value?.focus();
-                  });
-                }
+                // nextTick(() => {
+                //   select.searchEl.value?.focus();
+                // });
 
                 break;
               case "Escape":
                 select.show.value = false;
-                select.focusOption.value = -1;
+                select.focusOption.value = 0;
                 select.unRegisterOverlay();
                 break;
             }
@@ -674,17 +691,17 @@ export const LMultiSelectButton = defineComponent({
             //   // e.preventDefault();
             // }
           }, []),
-          onFocus: () => {
-            // console.log("focus select button", select.searchEl.value);
-            // if (!select.show.value) {
-            //   select.show.value = true
-            // }
-            nextTick(() => {
-              if (select.searchEl.value) {
-                select.searchEl.value.focus();
-              }
-            });
-          },
+          // onFocus: () => {
+          //   // console.log("focus select button", select.searchEl.value);
+          //   // if (!select.show.value) {
+          //   //   select.show.value = true
+          //   // }
+          //   nextTick(() => {
+          //     if (select.searchEl.value) {
+          //       select.searchEl.value.focus();
+          //     }
+          //   });
+          // },
         },
         slots.default
           ? slots.default({
@@ -812,7 +829,7 @@ export const LMultiSelectSearch = defineComponent({
           placeholder: select.field.value?.placeholder,
           disabled: select.disabled.value,
           "aria-expanded": select.show.value,
-          "aria-haspopup": true,
+          "aria-haspopup": "listbox",
           "aria-labelledby": select.field.value.label
             ? `${select.field.value.name}_label`
             : undefined,
@@ -951,7 +968,7 @@ export const LMultiSelectOptions = defineComponent({
           ref: select.listBoxEl,
           id: `${select.field.value.name}-listbox`,
           role: "listbox",
-          "aria-labelledby": `${select.field.value.name}-button`,
+          "aria-labelledby": `${select.field.value.name}_label`,
           tabindex: 0,
           ...aria.value,
           onKeydown: withModifiers(
@@ -971,9 +988,13 @@ export const LMultiSelectOptions = defineComponent({
               }
 
               if (e.key === "Escape") {
-                select.focusOption.value = -1;
+                select.focusOption.value = 0;
                 select.show.value = false;
-                select.selectButtonEl.value.focus({ preventScroll: true });
+                if (select.searchEl.value) {
+                  select.searchEl.value?.focus();
+                } else {
+                  select.selectButtonEl.value?.focus({ preventScroll: true });
+                }
                 return;
               }
 
@@ -986,14 +1007,13 @@ export const LMultiSelectOptions = defineComponent({
                 // select.filteredOptions.value[newIndex]?.focus();
                 const keyValue = select.field.value.keyValue;
                 const value = select.filteredOptions.value[newIndex];
-                const elForFocus = select.optionsEl.value.find(
-                  (x) => x.key == (keyValue ? value[keyValue] : value)
-                );
-                console.log(
-                  "focus option = ",
-                  newIndex,
-                  select.optionsEl.value
-                );
+                const elForFocus = select.optionsEl.value.find((x) => {
+                  let val = value;
+                  if (typeof value == "object" && keyValue) {
+                    val = value[keyValue];
+                  }
+                  return x.key == val;
+                });
                 if (elForFocus) {
                   //  && !select.searchEl.value
                   elForFocus.el?.focus();
@@ -1057,7 +1077,7 @@ export const LMultiSelectGroup = defineComponent({
   name: "LMultiSelectGroup",
   props: {
     group: {
-      type: [String],
+      type: [String, Number],
       default: "default",
       required: true,
     },
@@ -1251,7 +1271,14 @@ export const LMultiSelectOption = defineComponent({
               select.onChooseOption(props.value);
               if (!select.field.value.multiple) {
                 select.show.value = false;
-                select.selectButtonEl.value.focus({ preventScroll: true });
+
+                if (select.searchEl.value) {
+                  select.searchEl.value?.focus();
+                } else {
+                  select.selectButtonEl.value?.focus({
+                    preventScroll: true,
+                  });
+                }
                 e.preventDefault();
               }
             }

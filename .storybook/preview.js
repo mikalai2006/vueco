@@ -6,6 +6,8 @@ import { ripple } from "../src/directives/ripple";
 app.directive("ripple", ripple);
 import { autofocus } from "../src/directives/autofocus";
 app.directive("autofocus", autofocus);
+import { LBtn } from "../src/components/LBtn";
+app.component("LBtn", LBtn);
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -14,6 +16,20 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+  },
+  backgrounds: {
+    disable: true,
+    // default: "light",
+    // values: [
+    //   {
+    //     name: "light",
+    //     value: "#FAFAFA",
+    //   },
+    //   {
+    //     name: "dark",
+    //     value: "#18181B",
+    //   },
+    // ],
   },
 };
 export const globalTypes = {
@@ -52,7 +68,7 @@ export const decorators = [
       },
       components: { story },
       template:
-        '<div :class="[theme]"><div class="app"><div class="bg-white dark:bg-s-900 min-h-screen w-full"><story /></div></div></div>',
+        '<div :class="[theme]"><div class="app"><div class=" w-full p-6"><story /></div></div></div>',
     };
   },
 ];

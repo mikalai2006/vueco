@@ -1,3 +1,4 @@
+import FButton from "./FButton.vue";
 import FError from "./FError.vue";
 import FCheckbox from "./FCheckbox.vue";
 import FCombobox from "./FCombobox.vue";
@@ -7,8 +8,11 @@ import FTabs from "./FTabs.vue";
 import FText from "./FText.vue";
 import FTextarea from "./FTextarea.vue";
 import FMultiSelect from "./FMultiSelect.vue";
+import FSpinner from "./FSpinner.vue";
+import FMenu from "./FMenu.vue";
 
 export {
+  FButton,
   FError,
   FCheckbox,
   FCombobox,
@@ -18,4 +22,6 @@ export {
   FTabs,
   FText,
   FTextarea,
+  FSpinner,
+  FMenu,
 };

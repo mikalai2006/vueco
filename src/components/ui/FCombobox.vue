@@ -124,7 +124,7 @@ const showList = ref(false);
       :field="field"
       :error="error"
       class="relative flex-auto"
-      #default="{ combobox, isOpen, isBusy }"
+      #default="{ isOpen, isBusy, isNone }"
       @on-load-items="$emit('on-load-items')"
       @on-input="$emit('on-input')"
     >
@@ -133,7 +133,7 @@ const showList = ref(false);
       >
         <div class="flex-auto flex flex-wrap m-1">
           <LComboboxButton
-            v-if="combobox.isNone.value"
+            v-if="isNone"
             ref="inputElement"
             autocomplete="off"
             class="w-full px-2 py-1 outline-none bg-transparent"

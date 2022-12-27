@@ -8,51 +8,54 @@ import {
   provide,
   onMounted,
   onUnmounted,
+  watch,
+  type VNode,
 } from "vue";
 import type { Ref, InjectionKey, WritableComputedRef } from "vue";
 
-import { dom } from "@/composable/useDom";
 import { useId } from "@/composable/useId";
+import { useDom } from "@/composable/useDom";
 
 export type StateDefinition = {
   // State
-  selectedIndex: Ref<number | null>;
-  focusedIndex: Ref<number | null>;
-  selectedKey: Ref<string | null>;
-  focusedKey: Ref<string | null>;
+  selectedIndex: Ref<number>;
+  focusedIndex: Ref<number>;
+  selectedKey: Ref<string>;
+  focusedKey: Ref<string>;
   orientation: Ref<"vertical" | "horizontal">;
   activation: Ref<"auto" | "manual">;
   model: WritableComputedRef<string>;
 
-  tabs: Ref<{ tab: Ref<HTMLElement | null>; tabData: string }[]>;
-  panels: Ref<Ref<HTMLElement | null>[]>;
+  tabs: Ref<Ref<HTMLElement | null>[]>;
+  tabsKeys: Ref<string[]>;
+  panels: Ref<(HTMLElement | null)[]>;
 
   // State mutators
   setSelectedKey(key: string): void;
-  setFocusedIndex(index: string): void;
+  setFocusedIndex(tab: string): void;
   registerTab(tab: Ref<HTMLElement | null>, tabData: string): void;
   unregisterTab(tab: Ref<HTMLElement | null>, tabData: string): void;
-  registerPanel(panel: Ref<HTMLElement | null>): void;
-  unregisterPanel(panel: Ref<HTMLElement | null>): void;
+  registerPanel(panel: HTMLElement | null): void;
+  unregisterPanel(panel: HTMLElement | null): void;
 };
 
 export const TabsContext = Symbol(
   "TabsContext"
 ) as InjectionKey<StateDefinition>;
 
-// function useTabsContext(component: string) {
-//   const context = inject(TabsContext, null)
+function useContext(component: string) {
+  const context = inject(TabsContext, null);
 
-//   if (context === null) {
-//     const err = new Error(
-//       `<${component} /> is missing a parent <TabGroup /> component.`
-//     )
-//     if (Error.captureStackTrace) Error.captureStackTrace(err, useTabsContext)
-//     throw err
-//   }
+  if (context === null) {
+    const err = new Error(
+      `<${component} /> is missing a parent <TabGroup /> component.`
+    );
+    if (Error.captureStackTrace) Error.captureStackTrace(err, useContext);
+    throw err;
+  }
 
-//   return context
-// }
+  return context;
+}
 
 export const LTabs = defineComponent({
   name: "LTabs",
@@ -69,11 +72,12 @@ export const LTabs = defineComponent({
     "update:modelValue": (index: string) => index,
   },
   setup(props, { slots, emit }) {
-    const selectedIndex = ref<StateDefinition["selectedIndex"]["value"]>(null);
-    const focusedIndex = ref<StateDefinition["focusedIndex"]["value"]>(null);
-    const selectedKey = ref<StateDefinition["selectedKey"]["value"]>(null);
-    const focusedKey = ref<StateDefinition["focusedKey"]["value"]>(null);
+    const selectedIndex = ref<StateDefinition["selectedIndex"]["value"]>(0);
+    const focusedIndex = ref<StateDefinition["focusedIndex"]["value"]>(0);
+    const selectedKey = ref<StateDefinition["selectedKey"]["value"]>("");
+    const focusedKey = ref<StateDefinition["focusedKey"]["value"]>("");
     const tabs = ref<StateDefinition["tabs"]["value"]>([]);
+    const tabsKeys = ref<StateDefinition["tabsKeys"]["value"]>([]);
     const panels = ref<StateDefinition["panels"]["value"]>([]);
     const model = computed<StateDefinition["model"]["value"]>({
       get() {
@@ -92,35 +96,39 @@ export const LTabs = defineComponent({
       orientation: computed(() => (props.vertical ? "vertical" : "horizontal")),
       activation: computed(() => (props.manual ? "manual" : "auto")),
       tabs,
+      tabsKeys,
       panels,
       model,
       setSelectedKey(key: string) {
         if (selectedKey.value === key) return;
         selectedKey.value = key;
 
-        const index = tabs.value.findIndex((x) => x.tabData == key);
+        const index = tabsKeys.value.findIndex((x) => x == key);
         selectedIndex.value = index;
 
         emit("change", key);
         model.value = key;
         emit("update:modelValue", key);
       },
-      setFocusedIndex(key: string) {
-        if (focusedKey.value === key) return;
-        focusedKey.value = key;
-        const index = tabs.value.findIndex((x) => x.tabData == key);
-        focusedIndex.value = index;
+      setFocusedIndex(tab: string) {
+        if (focusedKey.value === tab) return;
+        focusedKey.value = tab;
+        const indexTab = tabsKeys.value.findIndex((x) => x == tab);
+        focusedIndex.value = indexTab;
       },
-      registerTab(tab: Ref<HTMLElement | null>, tabData: string) {
+      registerTab(tab: Ref<HTMLElement | null>, tabKey: string) {
         // if (!tabs.value[id]) tabs.value[id] = tab;
-        tabs.value.push({
-          tab,
-          tabData,
-        });
+        if (tab) {
+          tabs.value.push(tab);
+          tabsKeys.value.push(tabKey);
+        }
       },
-      unregisterTab(tab: typeof tabs.value[number], id: string) {
-        const idx = tabs.value.findIndex((x) => x.tabData === id);
-        if (idx !== -1) tabs.value.splice(idx, 1);
+      unregisterTab(tab: Ref<HTMLElement | null>, id: string) {
+        const idx = tabsKeys.value.findIndex((x) => x === id);
+        if (idx !== -1) {
+          tabs.value.splice(idx, 1);
+          tabsKeys.value.splice(idx, 1);
+        }
         // if (tabs.value[id]) delete tabs.value[id];
       },
       registerPanel(panel: typeof panels.value[number]) {
@@ -132,9 +140,23 @@ export const LTabs = defineComponent({
       },
     };
 
+    watch(
+      () => props.modelValue,
+      (val) => {
+        tabApi.setSelectedKey(val);
+      }
+    );
+
     provide(TabsContext, tabApi);
 
-    return () => h(props.as, { class: "tabs" }, [slots.default?.({ tabApi })]);
+    return () =>
+      h(
+        props.as as string,
+        { class: "tabs" },
+        {
+          default: () => (slots.default ? slots.default({ tabApi }) : []),
+        }
+      );
     // return () => {
     //   const slot = { selectedIndex: selectedIndex.value };
     //   const children = slots.default?.(slot);
@@ -154,7 +176,7 @@ export const LTabsList = defineComponent({
     as: { type: [Object, String], default: "div" },
   },
   setup(props, { slots }) {
-    const tabApi = inject(TabsContext);
+    const tabApi = useContext("LTabsList");
 
     // const slot = slots.default?.();
     // const tabList = []
@@ -172,12 +194,15 @@ export const LTabsList = defineComponent({
       };
 
       return h(
-        props.as,
+        props.as as string,
         {
           class: "tabs-list",
           ...ourProps,
         },
-        [slots.default?.({ ...props })]
+        {
+          default: () => (slots.default ? slots.default() : []),
+        }
+        // [slots.default?.({ ...props })]
       );
     };
   },
@@ -190,142 +215,64 @@ export const LTab = defineComponent({
     tab: { type: [String], default: "default" },
     disabled: { type: [Boolean], default: false },
   },
-  setup(props, { attrs, slots, expose }) {
-    const tabApi = inject(TabsContext);
+  setup(props, { slots, expose }) {
+    const tabApi = useContext("LTab");
+
     const id = `l-tabs-tab-${useId()}`;
 
     const internalTabRef = ref<HTMLElement | null>(null);
 
     expose({ el: internalTabRef, $el: internalTabRef });
 
-    // console.log("internalTabRef=", props.tab);
-
     onMounted(() => {
-      tabApi?.registerTab(internalTabRef, props.tab);
+      tabApi.registerTab(internalTabRef, props.tab);
       if (props.tab == tabApi?.model.value) {
-        // tabApi?.setSelectedKey(props.tab);
-        handleSelection();
+        tabApi.setSelectedKey(props.tab);
+        // handleSelection();
       }
     });
     onUnmounted(() => tabApi?.unregisterTab(internalTabRef, props.tab));
 
     const indexTab = computed(() =>
-      tabApi?.tabs.value.findIndex((x) => x.tab == internalTabRef.value)
+      tabApi?.tabs.value.findIndex((x) => x.value == internalTabRef.value)
     );
-    const selected = computed(() => props.tab === tabApi?.selectedKey.value);
-    const focused = computed(() => props.tab === tabApi?.focusedKey.value);
+    const selected = computed<boolean>(
+      () => props.tab === tabApi.selectedKey.value
+    );
+    const focused = computed(() => props.tab === tabApi.focusedKey.value);
 
-    const nextTab = (event) => {
-      if (tabApi.focusedIndex.value == tabApi?.tabs.value.length - 1) return;
+    const nextTab = (e: KeyboardEvent) => {
+      if (tabApi.focusedIndex.value == tabApi.tabs.value.length - 1) return;
       tabApi.focusedIndex.value = tabApi.focusedIndex.value + 1;
-      tabApi.tabs.value[tabApi.focusedIndex.value]?.tab.focus();
+      useDom(tabApi.tabs.value[tabApi.focusedIndex.value])?.focus();
 
-      event.preventDefault();
-      event.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
     };
-    const prevTab = (event) => {
+
+    const prevTab = (e: KeyboardEvent) => {
       if (tabApi.focusedIndex.value < 1) return;
-      tabApi.focusedIndex.value = tabApi?.focusedIndex.value - 1;
-      tabApi.tabs.value[tabApi.focusedIndex.value]?.tab.focus();
+      tabApi.focusedIndex.value = tabApi.focusedIndex.value - 1;
+      useDom(tabApi.tabs.value[tabApi.focusedIndex.value])?.focus();
 
-      event.preventDefault();
-      event.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
     };
 
-    function handleKeyDown(event: KeyboardEvent) {
-      // const list = tabApi?.tabs.value
-      //   .map((tab) => dom(tab))
-      //   .filter(Boolean) as HTMLElement[];
-
-      if (event.key === "Space" || event.key === "Enter") {
-        event.preventDefault();
-        event.stopPropagation();
-
-        tabApi?.setSelectedKey(props.tab);
-        return;
-      }
-
-      switch (event.key) {
-        case "Home":
-        case "PageUp":
-          event.preventDefault();
-          event.stopPropagation();
-
-          // dom(api.tabs.value[0])?.focus()
-          tabApi.tabs.value[0]?.focus();
-          // api.setSelectedKey(0)
-
-          return; // focusIn(list, Focus.First)
-
-        case "End":
-        case "PageDown":
-          event.preventDefault();
-          event.stopPropagation();
-          // dom(tabApi.tabs.value[tabApi.tabs.value.length - 1])?.focus()
-          tabApi.tabs.value[tabApi.tabs.value.length - 1]?.focus();
-          // tabApi.setSelectedKey(tabApi.tabs.value.length - 1)
-          return; // focusIn(list, Focus.Last)
-      }
-      // console.log("Event key=", event.key);
-
-      if (tabApi?.orientation.value == "vertical") {
-        if (event.key === "ArrowUp")
-          // return focusIn(list, Focus.Previous | Focus.WrapAround);
-          prevTab(event);
-        if (event.key === "ArrowDown")
-          // return focusIn(list, Focus.Next | Focus.WrapAround);
-          nextTab(event);
-        return;
-      } else {
-        // const indexCurrent = tabApi?.tabs.value.findIndex(
-        //   (x) => x.tabData == tabApi.focusedIndex.value
-        // );
-        // const currentTab =
-        //   indexCurrent !== -1 ? tabApi?.tabs.value[indexCurrent] : 0;
-        // console.log(
-        //   "Not vertical => index=",
-        //   indexCurrent,
-        //   " tab=",
-        //   currentTab
-        // );
-
-        if (event.key === "ArrowLeft") {
-          prevTab(event);
-          // console.log(
-          //   "focus tab-#",
-          //   tabApi.tabs.value[tabApi.focusedIndex.value]?.tab.focus()
-          // );
-          // dom(tabApi.tabs.value[tabApi.focusedIndex.value].tab)?.focus();
-          // return; // focusIn(list, Focus.Previous | Focus.WrapAround)
-        } else if (event.key === "ArrowRight") {
-          nextTab(event);
-          // console.log("focus tab-#", tabApi.focusedIndex.value);
-          // dom(tabApi.tabs.value[tabApi.focusedIndex.value].tab)?.focus();
-          // console.log(
-          //   "focus tab-#",
-          //   tabApi.tabs.value[tabApi.focusedIndex.value]?.tab.focus()
-          // );
-          // return; // focusIn(list, Focus.Next | Focus.WrapAround)
-          // return;
-        }
-      }
-    }
-
-    function handleFocus() {
-      internalTabRef.value?.focus();
+    const handleFocus = () => {
+      useDom(internalTabRef)?.focus();
       tabApi.setFocusedIndex(props.tab);
-    }
+    };
 
     /**
      * event click
      */
-    function handleSelection() {
+    const handleSelection = () => {
       if (props.disabled) return;
-
-      dom(internalTabRef)?.focus();
+      useDom(internalTabRef)?.focus();
       tabApi.setSelectedKey(props.tab);
       tabApi.setFocusedIndex(props.tab);
-    }
+    };
 
     // watch(
     //   () => tabApi?.model.value,
@@ -339,26 +286,64 @@ export const LTab = defineComponent({
     // This is important because we want to only focus the tab when it gets focus
     // OR it finished the click event (mouseup). However, if you perform a `click`,
     // then you will first get the `focus` and then get the `click` event.
-    function handleMouseDown(event: MouseEvent) {
-      event.preventDefault();
+    function handleMouseDown(e: MouseEvent) {
+      e.preventDefault();
     }
 
-    const type = "button";
-    // useResolveButtonType(
-    //   computed(() => ({ as: props.as, type: attrs.type })),
-    //   internalTabRef
-    // )
-    // console.log(
-    //   "tabApi.panels.value[indexTab.value]=",
-    //   tabApi.panels.value[indexTab.value],
-    //   " indexTab.value=",
-    //   indexTab.value
-    // );
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // const list = tabApi?.tabs.value
+      //   .map((tab) => dom(tab))
+      //   .filter(Boolean) as HTMLElement[];
+
+      if (e.key === "Space" || e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+
+        tabApi.setSelectedKey(props.tab);
+        return;
+      }
+
+      switch (e.key) {
+        case "Home":
+        case "PageUp":
+          e.preventDefault();
+          e.stopPropagation();
+
+          useDom(tabApi.tabs.value[0])?.focus();
+          tabApi.activation.value == "auto" &&
+            useDom(tabApi.tabs.value[0])?.click();
+          return;
+
+        case "End":
+        case "PageDown":
+          e.preventDefault();
+          e.stopPropagation();
+
+          useDom(tabApi.tabs.value[tabApi.tabs.value.length - 1])?.focus();
+          tabApi.activation.value == "auto" &&
+            useDom(tabApi.tabs.value[tabApi.tabs.value.length - 1])?.click();
+          return;
+      }
+
+      if (tabApi?.orientation.value == "vertical") {
+        if (e.key === "ArrowUp") prevTab(e);
+        if (e.key === "ArrowDown") nextTab(e);
+        return;
+      } else {
+        if (e.key === "ArrowLeft") {
+          prevTab(e);
+        } else if (e.key === "ArrowRight") {
+          nextTab(e);
+        }
+      }
+    };
+
+    const relatedPanel = computed(() => tabApi.panels.value[indexTab.value]);
 
     return () => {
-      const slot = { selected: selected.value };
+      // const slot: any = { selected: selected.value };
 
-      const ourProps = {
+      const ourProps: any = {
         ref: internalTabRef,
         onKeydown: handleKeyDown,
         onFocus:
@@ -367,24 +352,58 @@ export const LTab = defineComponent({
         onClick: handleSelection,
         id,
         role: "tab",
-        type: type.value,
-        "aria-controls": tabApi.panels.value[indexTab.value]?.value.id,
+        type: "button",
+        "aria-controls": relatedPanel.value?.id,
         "aria-selected": selected.value,
         tabIndex: selected.value ? 0 : -1,
         disabled: props.disabled ? true : undefined,
         ["data-deletable"]: false,
       };
 
-      let children = slots.default?.(slot);
-      // console.log("children", children);
+      // const children = slots.default ? slots.default(slot) : [];
 
-      // console.log(children);
-
-      return h(children[0], {
-        ...props,
-        ...ourProps,
-        selected: selected.value,
-      });
+      if (props.as == "template") {
+        const _slots = slots.default?.({
+          selected: selected.value,
+          focused: focused.value,
+        });
+        const _children = _slots?.length ? _slots[0] : _slots;
+        return _children
+          ? h(
+              _children,
+              Object.assign(
+                {},
+                ourProps,
+                {
+                  // ...props,
+                  selected: selected.value,
+                  focused: focused.value,
+                },
+                {
+                  ..._children?.props,
+                }
+              )
+            )
+          : null;
+      } else {
+        return h(
+          props.as as string,
+          {
+            // ...props,
+            ...ourProps,
+            selected: selected.value,
+            focused: focused.value,
+          },
+          {
+            default: () =>
+              slots.default
+                ? slots.default({
+                    selected: selected.value,
+                  })
+                : [],
+          }
+        );
+      }
     };
   },
 });
@@ -394,8 +413,8 @@ export const LTabPanels = defineComponent({
   props: {
     as: { type: [Object, String], default: "div" },
   },
-  setup(props, { slots, attrs }) {
-    const tabApi = inject(TabsContext);
+  setup(props, { slots }) {
+    const tabApi = useContext("LTabPanels");
 
     return () => {
       const slot = { selectedIndex: tabApi?.selectedIndex.value };
@@ -426,19 +445,22 @@ export const LTabPanel = defineComponent({
     static: { type: Boolean, default: false },
     unmount: { type: Boolean, default: true },
   },
-  setup(props, { attrs, slots, expose }) {
-    const tabApi = inject(TabsContext);
+  setup(props, { slots, expose }) {
+    const tabApi = useContext("LTabPanel");
+    if (!tabApi) {
+      return;
+    }
     const id = `l-tabs-panel-${useId()}`;
 
     const internalPanelRef = ref<HTMLElement | null>(null);
 
     expose({ el: internalPanelRef, $el: internalPanelRef });
 
-    onMounted(() => tabApi?.registerPanel(internalPanelRef));
-    onUnmounted(() => tabApi?.unregisterPanel(internalPanelRef));
+    onMounted(() => tabApi?.registerPanel(internalPanelRef.value));
+    onUnmounted(() => tabApi?.unregisterPanel(internalPanelRef.value));
 
     const myIndex = computed(() =>
-      tabApi.panels.value.indexOf(internalPanelRef)
+      tabApi.panels.value.indexOf(internalPanelRef.value)
     );
     const selected = computed(
       () => myIndex.value === tabApi.selectedIndex.value
@@ -450,7 +472,7 @@ export const LTabPanel = defineComponent({
         ref: internalPanelRef,
         id,
         role: "tabpanel",
-        "aria-labelledby": dom(tabApi.tabs.value[myIndex.value])?.id,
+        "aria-labelledby": useDom(tabApi.tabs.value[myIndex.value])?.id,
         tabIndex: selected.value ? 0 : -1,
       };
 
@@ -481,16 +503,6 @@ export const LTabPanel = defineComponent({
         },
         [slots.default?.(slot)]
       );
-      // return render({
-      //   ourProps,
-      //   theirProps: props,
-      //   slot,
-      //   attrs,
-      //   slots,
-      //   features: Features.Static | Features.RenderStrategy,
-      //   visible: selected.value,
-      //   name: "TabPanel",
-      // });
     };
   },
 });

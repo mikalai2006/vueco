@@ -15,10 +15,10 @@ import FNumber from "@/components/ui/FNumber.vue";
 import FMultiSelect from "@/components/ui/FMultiSelect.vue";
 import FCombobox from "@/components/ui/FCombobox.vue";
 
-import LBtn from "@/components/LBtn";
+import FButton from "@/components/ui/FButton.vue";
 
 import LIcon from "@/components/LIcon";
-import { LSpinner } from "@/components/LSpinner";
+import FSpinner from "@/components/ui/FSpinner.vue";
 
 import { useValidate } from "@/composable/useValidate";
 
@@ -221,18 +221,22 @@ const formData = [
     keyGroup: "group",
     group: "custom info",
     autofocus: true,
-    // multiple: true,
+    multiple: true,
     after: true,
     component: "FMultiSelect",
     label: "Your groups",
     description: "Input groups your know",
     placeholder: "Choose groups",
     items: [
-      { id: "one", group: "group1", title: "one item" },
-      { id: "two", group: "group2", title: "two item" },
-      { id: "three", group: "group1", title: "three item" },
+      { id: "one", group: "odd", title: "One item" },
+      { id: "two", group: "even", title: "two item" },
+      { id: "four", group: "even", title: "Four item" },
+      { id: "five", group: "odd", title: "Five item" },
+      { id: "six", group: "even", title: "Six item" },
+      { id: "seven", group: "odd", title: "Seven item" },
+      { id: "three", group: "odd", title: "three item" },
     ],
-    vtype: "string",
+    vtype: "array",
     rules: [
       {
         type: "required",
@@ -383,7 +387,7 @@ export const Default = () => ({
     LFormFieldLabel,
     LFormFieldDescription,
     LIcon,
-    LSpinner,
+    FSpinner,
 
     FError,
     FText,
@@ -393,7 +397,7 @@ export const Default = () => ({
     FMultiSelect,
     FCombobox,
 
-    LBtn,
+    FButton,
   },
   setup() {
     const forms = ref({
@@ -491,7 +495,7 @@ export const Default = () => ({
               </template>
 
               <template v-if="field.after" #after="{onReset, empty}">
-                <LBtn
+                <FButton
                   v-if="!empty"
                   mode="danger"
                   aria-label="reset"
@@ -501,7 +505,7 @@ export const Default = () => ({
                   <LIcon>
                     {{ iClose }}
                   </LIcon>
-                </LBtn>
+                </FButton>
               </template>
 
               <template #error>
@@ -514,12 +518,14 @@ export const Default = () => ({
             </component>
 
           </LFormField>
-          <LBtn @click="onSaveForm" fill mode="primary" ringed :disabled="Object.keys(errors).length > 0">
-            <LIcon>
-              {{iChat}}
-            </LIcon>
-            <span class="pl-2" >onSave</span>
-          </LBtn>
+          <FButton @click="onSaveForm" fill mode="primary" ringed :disabled="Object.keys(errors).length > 0">
+            <div class="flex">
+              <LIcon>
+                {{iChat}}
+              </LIcon>
+              <span class="pl-2" >onSave</span>
+            </div>
+          </FButton>
         </LForm>
     </div>
   `,
@@ -527,7 +533,7 @@ export const Default = () => ({
 // !forms[field.name] ? 'px-4' : 'pl-4 pr-12'
 
 // <div v-if="forms[field.name]" class="absolute right-1 top-2">
-// <LBtn
+// <FButton
 //   :mode="errorField ? 'danger' : 'second'"
 //   ringed
 //   class="text-lg leading-3 px-2"
@@ -536,5 +542,5 @@ export const Default = () => ({
 //   <LIcon>
 //     {{ iClose }}
 //   </LIcon>
-// </LBtn>
+// </FButton>
 // </div>

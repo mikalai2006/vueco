@@ -15,6 +15,7 @@ import {
   type WritableComputedRef,
   onUnmounted,
   watch,
+  type HTMLAttributes,
 } from "vue";
 import type { IField } from "@/components/LForm";
 import { useId } from "@/composable/useId";
@@ -199,6 +200,10 @@ export const LCombobox = defineComponent({
       type: String,
       default: "",
     },
+    showList: {
+      type: Boolean,
+      default: false,
+    },
     // ...IGeneralPropsFormElement,
   },
   emits: ["update:showList", "update:modelValue", "onLoadItems", "on-input"],
@@ -270,7 +275,6 @@ export const LCombobox = defineComponent({
       const _allOptions = field.value.items || [];
       // this.listboxNode.innerHTML = '';
 
-      console.log("filter value=", filter.value);
       // do not filter any options if autocomplete is none
       if ((isNone.value || filter.value.length === 0) && !flag) {
         // filter.value = "";
@@ -338,7 +342,6 @@ export const LCombobox = defineComponent({
     }
 
     const open = () => {
-      console.log("===open");
       isOpen.value = true;
       // onChooseFirstSelectedOption();
 
@@ -357,8 +360,6 @@ export const LCombobox = defineComponent({
     };
 
     const close = (e: Event | undefined, force?: boolean) => {
-      // console.log("close: start", e.target, force);
-
       if (typeof force !== "boolean") {
         force = false;
       }
@@ -376,7 +377,6 @@ export const LCombobox = defineComponent({
         (!combobox.listboxNode.value?.contains(el) &&
           combobox.comboboxNode.value != el)
       ) {
-        console.log("===close: force=", force);
         unRegisterOverlay();
         // this.setCurrentOptionStyle(false);
         isOpen.value = false;
@@ -402,7 +402,6 @@ export const LCombobox = defineComponent({
         document.removeEventListener("click", close);
         document.removeEventListener("keyup", close);
       }
-      console.log("unRegisterOverlay");
     };
 
     const registerOverlay = () => {
@@ -410,7 +409,6 @@ export const LCombobox = defineComponent({
         document.addEventListener("click", close);
         document.addEventListener("keyup", close);
       }
-      console.log("registerOverlay");
     };
 
     const onChangeActiveIndex = (e: KeyboardEvent, index?: number) => {
@@ -436,7 +434,6 @@ export const LCombobox = defineComponent({
           newIndex = 0;
         }
       }
-      console.log("onChangeActiveIndex: newIndex=", newIndex);
       combobox.focusOption.value = newIndex;
       return newIndex;
     };
@@ -479,7 +476,6 @@ export const LCombobox = defineComponent({
             (keyValue && typeof value == "object" ? value[keyValue] : value)
         );
         if (elForFocus?.el) {
-          console.log("elForFocus.el=", elForFocus.el);
           //  && !select.searchEl.value
           elForFocus.el?.focus();
         }
@@ -534,20 +530,16 @@ export const LCombobox = defineComponent({
 
       //   // combobox.filterText.value = value;
       // }
-      console.log("onChooseOption:", combobox.model.value, option);
     };
 
     const onSetValue = () => {
       // const _keyValue = combobox.field.value.keyValue;
       // console.group("onSetValue");
-      // console.log("filteredOptions: ", combobox.filteredOptions);
-      // console.log("filter: ", combobox.filter.value);
       if (field.value.multiple) {
         const newValue: TComboboxModel[] = [...combobox.model.value];
         const indexExists = combobox.model.value.findIndex(
           (x) => x == combobox.filter.value
         );
-        // console.log("indexExists=", indexExists);
         if (indexExists != -1) {
           newValue.splice(indexExists, 1);
         } else {
@@ -558,7 +550,7 @@ export const LCombobox = defineComponent({
       } else {
         combobox.model.value = [combobox.filter.value];
       }
-      // console.log("combobox.model.value=", combobox.model.value);
+      combobox.onFilterOptions();
       console.groupEnd();
     };
 
@@ -621,33 +613,17 @@ export const LCombobox = defineComponent({
     provide(ComboboxContext, combobox);
 
     return () =>
-      h(
-        "div",
-        {
-          onClick: withModifiers(
-            (e: MouseEvent) => {
-              console.log("LComboboxInput: onClick");
-              if (combobox.isOpen.value) {
-                combobox.close(e, true);
-              } else {
-                combobox.open();
-              }
-              comboboxNode.value?.focus();
-            },
-            ["stop"]
-          ),
-        },
-        {
-          default: () =>
-            slots.default
-              ? slots.default({
-                  combobox,
-                  isOpen: isOpen.value,
-                  isBusy: isBusy.value,
-                })
-              : [],
-        }
-      );
+      h("div", null, {
+        default: () =>
+          slots.default
+            ? slots.default({
+                // combobox,
+                isNone: isNone.value,
+                isOpen: isOpen.value,
+                isBusy: isBusy.value,
+              })
+            : [],
+      });
   },
 });
 
@@ -695,11 +671,16 @@ export const LComboboxInput = defineComponent({
     );
     // }
 
-    // const aria = computed(() => {
-    //   const aria: HTMLAttributes = {};
-    //   aria["aria-controls"] = `${combobox.field.value.name}-listbox`;
-    //   return aria;
-    // });
+    const aria = computed(() => {
+      const aria: HTMLAttributes = {};
+      // aria["aria-controls"] = `${combobox.field.value.name}-listbox`;
+      if (combobox.allOptions.value[combobox.focusOption.value]) {
+        aria["aria-activedescendant"] = `${
+          combobox.allOptions.value[combobox.focusOption.value]?.key
+        }`;
+      }
+      return aria;
+    });
 
     return () =>
       h(
@@ -716,9 +697,7 @@ export const LComboboxInput = defineComponent({
           "aria-autocomplete": combobox.autocomplete.value,
           "aria-expanded": combobox.isOpen.value,
           "aria-controls": `${combobox.field.value.name}-listbox`,
-          "aria-activedescendant": `${
-            combobox.allOptions.value[combobox.focusOption.value]?.key || ""
-          }`,
+          ...aria.value,
           onInput: (e: KeyboardEvent) => {
             const el = e.target as HTMLInputElement;
             if (searchDebounce.value) clearTimeout(searchDebounce.value);
@@ -728,7 +707,6 @@ export const LComboboxInput = defineComponent({
           },
           onClick: withModifiers(
             (e: MouseEvent) => {
-              console.log("LComboboxInput: onClick");
               if (combobox.isOpen.value) {
                 combobox.close(e, true);
               } else {
@@ -738,12 +716,10 @@ export const LComboboxInput = defineComponent({
             ["stop"]
           ),
           onKeydown: withModifiers((e: KeyboardEvent) => {
-            console.log("LComboboxInput: onKeydown", e.keyCode, e.key);
             let flag = false;
             const altKey = e.altKey;
             switch (e.key) {
               case "Enter":
-                console.log("LComboboxInput: press Enter");
                 if (combobox.isOpen.value && combobox.focusOption.value != -1) {
                   const addOption =
                     combobox.filteredOptions.value[combobox.focusOption.value];
@@ -767,7 +743,6 @@ export const LComboboxInput = defineComponent({
                 break;
               case "ArrowDown":
               case "Down":
-                console.log("LComboboxInput: press ArrowDown, Down");
                 if (combobox.hasOptions) {
                   if (altKey) {
                     !combobox.isOpen.value && combobox.open();
@@ -802,7 +777,6 @@ export const LComboboxInput = defineComponent({
                 break;
               case "Up":
               case "ArrowUp":
-                console.log("LComboboxInput: press Up, ArrowUp");
                 if (combobox.hasOptions) {
                   if (altKey) {
                     combobox.open();
@@ -843,7 +817,6 @@ export const LComboboxInput = defineComponent({
                 break;
               case "Esc":
               case "Escape":
-                console.log("LComboboxInput: press Esc, Escape");
                 if (combobox.isOpen.value) {
                   combobox.close(e, true);
                   // this.setVisualFocusCombobox();
@@ -864,7 +837,6 @@ export const LComboboxInput = defineComponent({
                 flag = true;
                 break;
               case "Tab":
-                console.log("LComboboxInput: press Tab");
                 combobox.close(e, true);
                 // this.close(true);
                 // if (this.listboxHasVisualFocus) {
@@ -875,13 +847,10 @@ export const LComboboxInput = defineComponent({
                 // break;
                 break;
               case "Home":
-                console.log("LComboboxInput: press Home");
                 combobox.comboboxNode.value?.setSelectionRange(0, 0);
                 flag = true;
                 break;
               case "End":
-                console.log("LComboboxInput: press End");
-
                 combobox.comboboxNode.value?.setSelectionRange(
                   combobox.filter.value.length,
                   combobox.filter.value.length
@@ -900,7 +869,6 @@ export const LComboboxInput = defineComponent({
             }
           }, []),
           onKeyup: withModifiers((e: KeyboardEvent) => {
-            console.log("LComboboxInput: onKeyup, ", e.key);
             let flag = false;
             // option = null;
             const char = e.key;
@@ -930,7 +898,6 @@ export const LComboboxInput = defineComponent({
 
             switch (e.key) {
               case "Backspace":
-                console.log("LComboboxInput: onKeyup: Backspace");
                 // this.setVisualFocusCombobox();
                 // this.setCurrentOptionStyle(false);
                 // combobox.filterText.value = combobox.filter.value;
@@ -946,7 +913,6 @@ export const LComboboxInput = defineComponent({
               case "ArrowRight":
               case "Home":
               case "End":
-                console.log("LComboboxInput: onKeyup: Left or other");
                 if (combobox.isBoth.value) {
                   // combobox.filterText.value = combobox.filter.value;
                 } else {
@@ -1004,7 +970,6 @@ export const LComboboxInput = defineComponent({
             }
           }, []),
           onFocus: () => {
-            console.log("LComboboxInput: onFocus");
             // combobox.filterText.value = combobox.filter.value;
             // this.filterOptions();
             // combobox.onFilterOptions();
@@ -1013,7 +978,6 @@ export const LComboboxInput = defineComponent({
             // this.setCurrentOptionStyle(null);
           },
           onBlur: () => {
-            console.log("LComboboxInput: onBlur");
             // this.removeVisualFocusAll();
           },
         },
@@ -1068,7 +1032,6 @@ export const LComboboxButton = defineComponent({
             combobox.allOptions.value[combobox.focusOption.value]?.key || ""
           }`,
           onClick: withModifiers((e: MouseEvent) => {
-            console.log("LComboboxButton: onClick");
             if (combobox.isOpen.value) {
               combobox.close(e, true);
             } else {
@@ -1076,12 +1039,10 @@ export const LComboboxButton = defineComponent({
             }
           }, []),
           onKeydown: withModifiers((e: KeyboardEvent) => {
-            console.log("LComboboxButton: onKeydown");
             let flag = false;
             const altKey = e.altKey;
             switch (e.key) {
               case "Enter":
-                console.log("LComboboxButton: press Enter");
                 if (combobox.isOpen.value && combobox.focusOption.value != -1) {
                   const addOption =
                     combobox.filteredOptions.value[combobox.focusOption.value];
@@ -1100,7 +1061,6 @@ export const LComboboxButton = defineComponent({
                 break;
               case "ArrowDown":
               case "Down":
-                console.log("LComboboxButton: press ArrowDown, Down");
                 if (combobox.hasOptions) {
                   if (altKey) {
                     !combobox.isOpen.value && combobox.open();
@@ -1135,7 +1095,6 @@ export const LComboboxButton = defineComponent({
                 break;
               case "Up":
               case "ArrowUp":
-                console.log("LComboboxButton: press Up, ArrowUp");
                 if (combobox.hasOptions) {
                   if (altKey) {
                     combobox.open();
@@ -1180,7 +1139,6 @@ export const LComboboxButton = defineComponent({
                 break;
               case "Esc":
               case "Escape":
-                console.log("LComboboxButton: press Esc, Escape");
                 if (combobox.isOpen.value) {
                   combobox.close(e, true);
                 } else {
@@ -1192,15 +1150,12 @@ export const LComboboxButton = defineComponent({
                 flag = true;
                 break;
               case "Tab":
-                console.log("LComboboxButton: press Tab");
                 combobox.close(e, true);
                 break;
               case "Home":
-                console.log("LComboboxButton: press Home");
                 flag = true;
                 break;
               case "End":
-                console.log("LComboboxButton: press End");
                 flag = true;
                 break;
               default:
@@ -1240,24 +1195,15 @@ export const LComboboxOptions = defineComponent({
           ref: combobox.listboxNode,
           id: `${combobox.field.value.id}-listbox`,
           role: "listbox",
-          "aria-labelledby": `${combobox.field.value.id}-button`,
+          "aria-labelledby": `${combobox.field.value.id}`,
           // tabindex: 0,
           // ...aria.value,
-          onKeydown: withModifiers(
-            (e: KeyboardEvent) => {
-              console.log("LComboboxOptions: onKeyDown", e.key);
-            },
-            ["stop"]
-          ),
-          onPointerup: () => {
-            console.log("LComboboxOptions: onPointerup");
-          },
+          onKeydown: withModifiers((e: KeyboardEvent) => {}, ["stop"]),
+          onPointerup: () => {},
           onPointerover: () => {
-            console.log("LComboboxOptions: onPointerover");
             combobox.hasHover.value = true;
           },
           onPointerout: () => {
-            console.log("LComboboxOptions: onPointerout");
             combobox.hasHover.value = false;
           },
         },
@@ -1303,7 +1249,6 @@ export const LComboboxOption = defineComponent({
     );
 
     const selected = computed(() => {
-      // console.log('computed check')
       return combobox.model.value.includes(
         combobox.field.value.keyValue && typeof props.value == "object"
           ? props.value[combobox.field.value.keyValue]
@@ -1312,7 +1257,6 @@ export const LComboboxOption = defineComponent({
     });
 
     const hovered = computed(() => {
-      // console.log('computed check')
       const keyValue = combobox.field.value.keyValue;
       const value = combobox.filteredOptions.value[combobox.focusOption.value];
       let isHovered = false;
@@ -1344,7 +1288,6 @@ export const LComboboxOption = defineComponent({
     );
 
     onUnmounted(() => {
-      // console.log("remove key=", index);
       // delete select.optionsElement.value[key.value];
       combobox?.allOptions.value.splice(index.value, 1);
     });
@@ -1362,10 +1305,8 @@ export const LComboboxOption = defineComponent({
           // ...aria.value,
           onKeydown: withModifiers(
             (e: KeyboardEvent) => {
-              console.log("LComboboxOption: onKeyDown", e.key);
               // switch (e.key) {
               //   case "Enter":
-              //     console.log("LComboboxOption: press Enter");
               //     combobox.onChooseOption(props.value);
               //     // if (this.listboxHasVisualFocus) {
               //     //   this.setValue(this.option.textContent);
@@ -1380,20 +1321,17 @@ export const LComboboxOption = defineComponent({
               //   () => select.clearSearchQuery(),
               //   350
               // );
-
               // // select all options
               // if (e.ctrlKey && e.key === "a") {
               //   toggleChooseAll();
               //   e.preventDefault();
               // }
-
               // if (e.key === "Escape") {
               //   select.focusOption.value = -1;
               //   select.show.value = false;
               //   select.selectButtonEl.value.focus({ preventScroll: true });
               //   return;
               // }
-
               // change index active option.
               // const newIndex = select.onChangeActiveIndex(e);
               // e.preventDefault();
@@ -1423,7 +1361,6 @@ export const LComboboxOption = defineComponent({
               // if (!e.shiftKey) {
               //   select.indexShiftFrom.value = newIndex;
               // }
-
               // if (
               //   e.shiftKey &&
               //   (e.key === "ArrowDown" || e.key === "ArrowUp")
@@ -1450,7 +1387,6 @@ export const LComboboxOption = defineComponent({
             ["stop"]
           ),
           onPointerup: () => {
-            console.log("LComboboxOption: onPointerup");
             // if (
             //   !this.comboboxNode.contains(event.target) &&
             //   !this.listboxNode.contains(event.target) &&
@@ -1463,11 +1399,9 @@ export const LComboboxOption = defineComponent({
             // }
           },
           onPointerover: () => {
-            console.log("LComboboxOption: onPointerover");
             combobox.hasHover.value = true;
           },
           onPointerout: () => {
-            console.log("LComboboxOption: onPointerout");
             combobox.hasHover.value = false;
             // setTimeout(this.close.bind(this, false), 300);
           },
@@ -1496,7 +1430,6 @@ export const LComboboxOption = defineComponent({
           //   }
           // },
           // onFocus: () => {
-          //   console.log("LMultiSelectOptions: onFocus");
           // },
         },
         slots.default

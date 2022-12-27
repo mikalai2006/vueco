@@ -2,10 +2,12 @@ import { ref } from "vue";
 
 import { ArgsTable, Source, Canvas, Meta, Story } from "@storybook/addon-docs";
 
-import LBtn from "./LBtn";
+import { LBtn } from "@/components/LBtn";
 import LIcon from "../LIcon/LIcon";
-import LSpinner from "../LSpinner/LSpinner";
+import FSpinner from "@/components/ui/FSpinner.vue";
 import dedent from "ts-dedent";
+
+import FButton from "@/components/ui/FButton.vue";
 
 export const iBell =
   "M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z";
@@ -19,37 +21,20 @@ export const iCart =
     mode: {
       control: {
         type: "select",
-        options: ["primary", "accent", "second", "danger"],
       },
+      options: ["primary", "second", "danger"],
     },
-    rounded: {
+    as: {
       control: {
         type: "select",
-        options: [
-          "rounded-none",
-          "rounded-sm",
-          "rounded",
-          "rounded-md",
-          "rounded-xl",
-          "rounded-full",
-        ],
       },
+      options: ["div", "a", "button"],
     },
-    size: {
-      control: {
-        type: "select",
-        options: [
-          "text-xs",
-          "text-sm",
-          "text-base",
-          "text-lg",
-          "text-xl",
-          "text-2xl",
-          "text-3xl",
-          "text-4xl",
-          "text-5xl",
-        ],
-      },
+    disabled: {
+      control: "boolean",
+    },
+    fill: {
+      control: "boolean",
     },
   }}
 />
@@ -70,505 +55,212 @@ export const Template = (args) => {
 
 # LBtn
 
-## Default
-
-<Story name="Default" args={{}}>
-  {Template.bind({})}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-  <LBtn>Button</LBtn>
-  `}
-  ></Source>
-</div>
-
 ## All
 
+<Story name="All" args={{}}>
+  {(args) => {
+    return {
+      components: { FButton, LIcon },
+      setup() {
+        return {
+          iBell,
+        };
+      },
+      template: `
+      <div class="flex flex-col space-y-6">
+        <h1>Button</h1>
+        <h2>Secondary</h2>
+        <div class="flex flex-wrap">
+          <div class="p-2">
+            <FButton>Secondary</FButton>
+          </div>
+          <div class="p-2">
+            <FButton fill>Secondary</FButton>
+          </div>
+          <div class="p-2 text-xl">
+            <FButton aria-label="bell">
+              <LIcon>
+                {{iBell}}
+              </LIcon>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton fill aria-label="bell">
+              <span class="flex items-center space-x-2">
+                <LIcon role="presentation">
+                  {{iBell}}
+                </LIcon>
+                <span>Secondary</span>
+              </span>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton fill disabled>Disabled</FButton>
+          </div>
+        </div>
+        <h2>Primary</h2>
+        <div class="flex flex-wrap">
+          <div class="p-2">
+            <FButton mode="primary">Primary</FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="primary" fill>Primary</FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="primary" aria-label="bell">
+              <LIcon>
+                {{iBell}}
+              </LIcon>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="primary" fill aria-label="bell">
+              <span class="flex items-center space-x-2">
+                <span>Primary</span>
+                <LIcon role="presentation">
+                  {{iBell}}
+                </LIcon>
+              </span>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="primary" disabled aria-label="bell">
+              <LIcon>
+                {{iBell}}
+              </LIcon>
+            </FButton>
+          </div>
+        </div>
+        <h2>Danger</h2>
+        <div class="flex flex-wrap">
+          <div class="p-2">
+            <FButton mode="danger">Danger</FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="danger" fill>Danger</FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="danger" aria-label="bell">
+              <LIcon>
+                {{iBell}}
+              </LIcon>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="danger" fill>
+              <span class="flex items-center space-x-2">
+                <span>Danger</span>
+                <LIcon role="presentation">
+                  {{iBell}}
+                </LIcon>
+              </span>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="danger" disabled fill>
+              <span class="flex items-center space-x-2">
+                <LIcon role="presentation">
+                  {{iBell}}
+                </LIcon>
+                <span>Danger</span>
+              </span>
+            </FButton>
+          </div>
+        </div>
+        <h2>Link</h2>
+        <div class="flex flex-wrap">
+          <div class="p-2">
+            <FButton mode="link">Danger</FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="link" fill>Danger</FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="link" aria-label="bell">
+              <LIcon>
+                {{iBell}}
+              </LIcon>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="link" fill>
+              <span class="flex items-center space-x-2">
+                <span>Danger</span>
+                <LIcon role="presentation">
+                  {{iBell}}
+                </LIcon>
+              </span>
+            </FButton>
+          </div>
+          <div class="p-2">
+            <FButton mode="link" disabled fill>
+              <span class="flex items-center space-x-2">
+                <LIcon role="presentation">
+                  {{iBell}}
+                </LIcon>
+                <span>Danger</span>
+              </span>
+            </FButton>
+          </div>
+        </div>
+      </div>
+      `,
+    };
+  }}
+</Story>
+
+## FButton
+
+<Story name="FButton" args={{}}>
+  {(args) => {
+    return {
+      components: { FButton },
+      setup() {
+        const pressed = ref(false);
+        return {
+          args: {
+            ...args,
+          },
+          iBell,
+          pressed,
+        };
+      },
+      template: `
+      <div class="">
+        <FButton v-bind="args" v-model:pressed="pressed">Primary</FButton>
+      </div>
+      `,
+    };
+  }}
+</Story>
+
+<ArgsTable story="FButton" />
+
 <Canvas>
-  <Story
-    name="All"
-    args={{
-      mode: "primary",
-    }}
-  >
+  <Story name="FButtonWithSpinner" args={{}}>
     {(args) => {
       return {
-        components: { LBtn, LIcon, LSpinner },
+        components: { FButton, FSpinner },
         setup() {
+          const pressed = ref(false);
           return {
             args: {
               ...args,
             },
             iBell,
+            pressed,
           };
         },
         template: `
-        <h2>Default</h2>
-        <div class="flex flex-wrap items-center space-y-4 space-x-4 p-2">
-          <LBtn v-bind="args" class="active mt-4 p-2" ringed>
-            <LIcon>
-              {{iBell}}
-            </LIcon>
-            <div class="pl-2">active</div>
-          </LBtn>
-          <LBtn v-bind="args" bordered rounded="rounded-full" class="text-xl mt-4 p-2" ringed aria-label="button">
-            <LIcon>
-              {{iBell}}
-            </LIcon>
-          </LBtn>
-          <LBtn v-bind="args" ringed aria-label="button">
-            <LSpinner />
-            <div class="pl-2">
-              Icon
-            </div>
-          </LBtn>
-          <LBtn v-bind="args" bordered ringed>
-            bordered
-          </LBtn>
-          <LBtn v-bind="args" fill bordered ringed>
-            Fill bordered
-          </LBtn>
-          <LBtn v-bind="args" class="active" fill bordered ringed>
-            Fill bordered active
-          </LBtn>
-          <LBtn v-bind="args" fill bordered rounded="rounded-full" ringed>
-            Rounded full fill bordered
-          </LBtn>
-          <LBtn v-bind="args" fill bordered disabled ringed>
-            Disable
-          </LBtn>
-        </div>
-        <h2 class="pt-12">Inverse</h2>
-        <div class="flex flex-wrap items-center space-y-4 space-x-4 p-12 bg-s-800 dark">
-          <LBtn v-bind="args" class="active mt-4 p-2" ringed>
-            <LIcon>
-              {{iBell}}
-            </LIcon>
-            <div class="pl-2">active</div>
-          </LBtn>
-          <LBtn v-bind="args" bordered rounded="rounded-full" class="text-xl mt-4 p-2" ringed aria-label="button">
-            <LIcon>
-              {{iBell}}
-            </LIcon>
-          </LBtn>
-          <LBtn v-bind="args" ringed aria-label="button">
-            <LSpinner />
-            <div class="pl-2">
-              Icon
-            </div>
-          </LBtn>
-          <LBtn v-bind="args" bordered ringed>
-            bordered
-          </LBtn>
-          <LBtn v-bind="args" fill bordered ringed>
-            Fill bordered
-          </LBtn>
-          <LBtn v-bind="args" class="active" fill bordered ringed>
-            Fill bordered active
-          </LBtn>
-          <LBtn v-bind="args" fill bordered rounded="rounded-full" ringed>
-            Rounded full fill bordered
-          </LBtn>
-          <LBtn v-bind="args" fill bordered disabled ringed>
-            Disable
-          </LBtn>
-        </div>
+        <FButton v-bind="args" v-model:pressed="pressed">
+          <div class="flex items-center">
+            <FSpinner role="presentation" class="mr-2" /> Load
+          </div>
+        </FButton>
         `,
       };
     }}
   </Story>
 </Canvas>
 
-<ArgsTable story="All" />
-
-## Mode
-
-<Story name="Mode" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        return {
-          args: {
-            ...args,
-          },
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex flex-row space-x-4">
-        <LBtn mode="primary">Primary</LBtn>
-        <LBtn mode="second">Second</LBtn>
-        <LBtn mode="accent">Accent</LBtn>
-        <LBtn mode="danger">Danger</LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-        <LBtn mode="primary">Primary</LBtn>
-        <LBtn mode="second">Second</LBtn>
-        <LBtn mode="accent">Accent</LBtn>
-        <LBtn mode="danger">Danger</LBtn>
-  `}
-  ></Source>
-</div>
-
-## Ringed
-
-<Story name="Ringed" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        return {
-          args: {
-            ...args,
-          },
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex flex-row space-x-4">
-        <LBtn mode="primary" ringed>Primary</LBtn>
-        <LBtn mode="second" ringed>Second</LBtn>
-        <LBtn mode="accent" ringed>Accent</LBtn>
-        <LBtn mode="danger" ringed>Danger</LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-        <LBtn mode="primary" ringed>Primary</LBtn>
-        <LBtn mode="second" ringed>Second</LBtn>
-        <LBtn mode="accent" ringed>Accent</LBtn>
-        <LBtn mode="danger" ringed>Danger</LBtn>
-  `}
-  ></Source>
-</div>
-
-## Fill
-
-<Story name="Fill" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        return {
-          args: {
-            ...args,
-          },
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex flex-row space-x-4">
-        <LBtn mode="primary" fill ringed>Primary</LBtn>
-        <LBtn mode="second" fill ringed>Second</LBtn>
-        <LBtn mode="accent" fill ringed>Accent</LBtn>
-        <LBtn mode="danger" fill ringed>Danger</LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-        <LBtn mode="primary" fill ringed>Primary</LBtn>
-        <LBtn mode="second" fill ringed>Second</LBtn>
-        <LBtn mode="accent" fill ringed>Accent</LBtn>
-        <LBtn mode="danger" fill ringed>Danger</LBtn>
-  `}
-  ></Source>
-</div>
-
-## Bordered
-
-<Story name="Bordered" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        return {
-          args: {
-            ...args,
-          },
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex flex-row space-x-4">
-        <LBtn mode="primary" bordered ringed>Primary</LBtn>
-        <LBtn mode="second" bordered ringed>Second</LBtn>
-        <LBtn mode="accent" bordered ringed>Accent</LBtn>
-        <LBtn mode="danger" bordered ringed>Danger</LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-        <LBtn mode="primary" bordered ringed>Primary</LBtn>
-        <LBtn mode="second" bordered ringed>Second</LBtn>
-        <LBtn mode="accent" bordered ringed>Accent</LBtn>
-        <LBtn mode="danger" bordered ringed>Danger</LBtn>
-  `}
-  ></Source>
-</div>
-
-## Rounded
-
-<Story name="Rounded" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        return {
-          args: {
-            ...args,
-          },
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex flex-row space-x-4">
-        <LBtn mode="second" bordered ringed rounded="rounded-lg">rounded-lg</LBtn>
-        <LBtn fill mode="second"  bordered ringed rounded="rounded-xl">rounded-xl</LBtn>
-        <LBtn mode="second" bordered ringed rounded="rounded-2xl">rounded-2xl</LBtn>
-        <LBtn mode="second" bordered ringed rounded="rounded-full">rounded-full</LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-        <LBtn mode="second" bordered ringed rounded="rounded-lg">rounded-lg</LBtn>
-        <LBtn fill mode="second" bordered ringed rounded="rounded-xl">rounded-xl</LBtn>
-        <LBtn mode="second" bordered ringed rounded="rounded-2xl">rounded-2xl</LBtn>
-        <LBtn mode="second" bordered ringed rounded="rounded-full">rounded-full</LBtn>
-  `}
-  ></Source>
-</div>
-
-## Icons
-
-<Story name="Icons" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        return {
-          args: {
-            ...args,
-          },
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex flex-row items-center space-x-4">
-        <LBtn mode="primary" bordered ringed rounded="rounded-full p-4" class="text-4xl">
-          <LIcon>{{iBell}}</LIcon>
-        </LBtn>
-        <LBtn mode="second" bordered ringed fill>
-          <div class="pr-2">with text</div>
-          <LIcon>{{iBell}}</LIcon>
-        </LBtn>
-        <LBtn mode="second" bordered ringed>
-          <LIcon>{{iBell}}</LIcon>
-          <div class="pl-2">with text</div>
-        </LBtn>
-        <LBtn mode="danger" bordered ringed rounded="rounded-full">
-          <LIcon>{{iBell}}</LIcon>
-        </LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-        <LBtn mode="primary" bordered ringed rounded="rounded-full p-4" class="text-4xl">
-          <LIcon>{{iBell}}</LIcon>
-        </LBtn>
-        <LBtn mode="second" bordered ringed fill>
-          <div class="pr-2">with text</div>
-          <LIcon>{{iBell}}</LIcon>
-        </LBtn>
-        <LBtn mode="second" bordered ringed>
-          <LIcon>{{iBell}}</LIcon>
-          <div class="pl-2">with text</div>
-        </LBtn>
-        <LBtn mode="danger" bordered ringed rounded="rounded-full">
-          <LIcon>{{iBell}}</LIcon>
-        </LBtn>
-  `}
-  ></Source>
-</div>
-
-## Loading status
-
-<Story
-  name="Loading"
-  args={{
-    mode: "primary",
-    fill: true,
-  }}
->
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        const load = ref(false);
-        return {
-          args: {
-            ...args,
-          },
-          load,
-          iBell,
-        };
-      },
-      template: `
-      <div class="flex items-center">
-        <LBtn v-bind="args" rounded="rounded-full p-2" :disabled="load || args.disabled" class="text-xl mr-4">
-          <LSpinner v-if="load"/>
-          <LIcon v-else>
-            {{iBell}}
-          </LIcon>
-        </LBtn>
-        <LBtn v-bind="args" :disabled="load || args.disabled">
-          <LSpinner v-if="load"/>
-          <LIcon v-else>
-            {{iBell}}
-          </LIcon>
-          <div class="pl-2">
-            With icon
-          </div>
-        </LBtn>
-        <LBtn v-bind="args" class="ml-4" :disabled="load || args.disabled">
-          <LSpinner v-if="load"/>
-          Simple
-        </LBtn>
-        <LBtn v-bind="args" class="ml-4 active" :disabled="load || args.disabled">
-          <LSpinner v-if="load"/>
-          Active
-        </LBtn>
-      </div>
-        <LBtn @click="load = !load">Toggle load</LBtn>`,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-  <LBtn fill mode="primary">
-    <LSpinner>Icon</LSpinner>
-  </LBtn>
-  `}
-  ></Source>
-</div>
-
-<ArgsTable story="Loading" />
-
-export const sizesClass = [
-  "text-xs",
-  "text-sm",
-  "text-base",
-  "text-lg",
-  "text-xl",
-  "text-2xl",
-  "text-3xl",
-  "text-4xl",
-  "text-5xl",
-  "text-6xl",
-  "text-7xl",
-  "text-8xl",
-];
-
-## Sizes
-
-<Story name="Sizes" args={{}}>
-  {(args) => {
-    return {
-      components: { LBtn, LIcon, LSpinner },
-      setup() {
-        const load = ref(false);
-        return {
-          args: {
-            ...args,
-          },
-          sizesClass,
-          iCart,
-          load,
-        };
-      },
-      template: `
-      <div class="flex flex-wrap flex-row items-center space-x-4">
-        <LBtn v-for="size in sizesClass" :disabled="load" bordered ringed :class="['mb-4', size]">
-          <LSpinner v-if="load" />
-          <LIcon v-else>{{iCart}}</LIcon>
-          <div class="pl-2">{{size}}</div>
-        </LBtn>
-        <hr />
-        <LBtn :fill="load" @click="load = !load" bordered class="text-sm">toggle load status</LBtn>
-      </div>
-      `,
-    };
-  }}
-</Story>
-
-<div>
-  <Source
-    language="js"
-    code={dedent`
-      <LBtn bordered ringed class="text-lg">
-        <LIcon>{{iBell}}</LIcon>
-        <div class="pl-2">{{size}}</div>
-      </LBtn>
-  `}
-  ></Source>
-</div>
-
-## Playground
-
-<Canvas>
-  <Story
-    name="Playground"
-    args={{
-      mode: "second",
-      fill: true,
-    }}
-  >
-    {Template.bind({})}
-  </Story>
-</Canvas>
-
-<ArgsTable story="Playground" />
+<ArgsTable story="FButtonWithSpinner" />

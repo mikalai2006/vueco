@@ -14,18 +14,18 @@ export const ssrTransformCustomDir = () => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  test: {
-    coverage: {
-      provider: "istanbul", // or 'c8'
-    },
-  },
+  // test: {
+  //   coverage: {
+  //     provider: "istanbul", // or 'c8'
+  //   },
+  // },
   plugins: [
     vue({
       template: {
         // ssr: true,
         compilerOptions: {
           directiveTransforms: {
-            ripple: ssrTransformCustomDir,
+            // ripple: ssrTransformCustomDir,
             autofocus: ssrTransformCustomDir,
             // editbox: ssrTransformCustomDir,
             // 'observe-visibility': ssrTransformCustomDir,
@@ -42,6 +42,7 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+    dedupe: ["vue"],
   },
   build: {
     lib: {

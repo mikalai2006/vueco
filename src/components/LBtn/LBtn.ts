@@ -1,112 +1,66 @@
-// btn-primary, btn-accent, btn-second, btn-danger
-import {
-  h,
-  defineComponent,
-  withDirectives,
-  resolveDirective,
-  computed,
-} from "vue";
+import { h, defineComponent, type PropType, ref } from "vue";
 
-import type { PropType } from "vue";
+export enum TypeBtnMode {
+  primary = "primary",
+  second = "second",
+  accent = "accent",
+  danger = "danger",
+  link = "link",
+}
+export enum TypeBtnTag {
+  a = "a",
+  div = "div",
+  button = "button",
+}
 
-type TypeBtnType = "" | "primary" | "second" | "accent" | "danger";
-// type TypeBtnHtmlProperty = {
-//   'aria-label': string
-//   name: string
-//   title: string
-//   id: string
-// }
-export type TypePropsBtn = {
-  mode: TypeBtnType;
-  // htmlProperty: TypeBtnHtmlProperty
-};
-
-export default defineComponent({
+export const LBtn = defineComponent({
   name: "LBtn",
   props: {
-    /**
-     * Mode button - 'primary' | 'second' | 'accent' | 'danger'
-     */
-    mode: {
-      type: String as PropType<TypeBtnType>,
-      default: "second",
-    },
-    fill: {
-      type: Boolean,
-      default: false,
-    },
-    bordered: {
-      type: Boolean,
-      default: false,
+    as: {
+      type: String as PropType<keyof typeof TypeBtnTag>,
+      default: "button",
+      validator(val: TypeBtnTag) {
+        return [...Object.values(TypeBtnTag)].includes(val);
+      },
     },
     disabled: {
       type: Boolean,
       default: false,
     },
-    // htmlProperty: {
-    //   type: Object as PropType<TypeBtnHtmlProperty>,
-    //   default: () => {
-    //     return {}
-    //   },
-    //   required: false,
-    // },
     /**
-     * Icon for button
+     * V-model pressed for pressed mode button
      */
-    // icon: {
-    //   type: [String, Boolean],
-    //   default: false,
-    // },
-    /**
-     * Ring effect of button
-     */
-    ringed: {
+    pressed: {
       type: Boolean,
       default: false,
     },
   },
-  setup(props, { slots }) {
-    const colors = computed(() => `btn-${props.mode}`);
-    const rippleObj = computed(() => {
-      return { class: `fill active ${colors.value} -z-10` };
-    });
-    const ripple: any = resolveDirective("ripple");
+  emit: ["update:pressed"],
+  setup(props, { slots, emit }) {
     return () =>
-      withDirectives(
-        h(
-          "button",
-          {
-            type: "button",
-            class: [
-              "btn",
-              colors.value,
-              {
-                fill: props.fill,
-                bordered: props.bordered,
-                ringed: props.ringed,
-                disabled: props.disabled,
-              },
-              "b-rounded ring-offset-2 ring-offset-white dark:ring-offset-s-800 transition",
-            ],
-            disabled: props.disabled,
-            // class: [
-            //   'btn',
-            //   !this.disabled ? colors() : '',
-            //   {
-            //     fill: this.fill,
-            //     bordered: this.bordered,
-            //     ringed: this.ringed,
-            //     disabled: this.disabled,
-            //   },
-            //   this.rounded,
-            //   this.size,
-            //   'p-2',
-            // ],
-            // disabled: this.disabled,
+      h(
+        props.as,
+        {
+          role: !["button", "input"].includes(props.as) ? "button" : undefined,
+          tabindex: !["button", "input"].includes(props.as) ? 0 : undefined,
+          type: ["input", "button"].includes(props.as) ? "button" : undefined,
+          "aria-pressed": !["button", "input"].includes(props.as)
+            ? props.pressed == true
+            : undefined,
+          disabled: props.disabled || undefined,
+          onClick: () => {
+            !props.disabled && emit("update:pressed", !props.pressed);
+            // console.log("click");
           },
-          [slots.default ? slots.default() : []]
-        ),
-        [[ripple, rippleObj.value]]
+          onKeydown: (e: KeyboardEvent) => {
+            (e.key === "Space" || e.key === "Enter") &&
+              !props.disabled &&
+              emit("update:pressed", !props.pressed);
+          },
+        },
+        {
+          default: () => (slots.default ? slots.default() : []),
+        }
       );
   },
 });

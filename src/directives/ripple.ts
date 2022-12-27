@@ -1,13 +1,15 @@
 const removeEl = function (params: any) {
-  const { circle } = params;
-  if (circle) {
-    circle.remove();
+  const { preCircle } = params;
+  if (preCircle) {
+    preCircle.remove();
   }
 };
 
 const createRipple = (event: any) => {
   const button = event.currentTarget;
   const options = event.currentTarget.ripple_options;
+  const preCircle = document.createElement("div");
+  preCircle.className += "overflow-hidden absolute inset-0 b-rounded";
   const circle = document.createElement("span");
   const diameter = Math.max(button.clientWidth, button.clientHeight);
   const radius = diameter / 2;
@@ -25,10 +27,13 @@ const createRipple = (event: any) => {
   circle.style.animation = `ripple ${options.duration || 600}ms ${
     options.timingf || "linear"
   }`;
+  preCircle.appendChild(circle);
+  button.prepend(preCircle);
 
-  button.appendChild(circle);
-
-  setTimeout(removeEl.bind(null, { circle, options }), options.duration || 600);
+  setTimeout(
+    removeEl.bind(null, { preCircle, options }),
+    options.duration || 600
+  );
 };
 
 export const ripple = {

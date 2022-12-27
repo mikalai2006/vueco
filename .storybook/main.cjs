@@ -17,6 +17,10 @@ module.exports = {
   viteFinal: (config, { configType }) => {
     // customize the Vite config here
     config.resolve.alias["@"] = "/src";
+    // some configs
+    if (configType === "PRODUCTION") {
+      config.base = "/vueco/";
+    }
 
     // config.resolve.alias['path'] = 'path-browserify'
     // config.resolve.alias['crypto'] = 'crypto-browserify'

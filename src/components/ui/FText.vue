@@ -46,6 +46,8 @@ const onSetFocus = () => {
   if (el) el.focus();
 };
 
+const empty = computed(() => model.value == "");
+
 const onReset = () => {
   model.value = "";
   emit("on-input");
@@ -84,7 +86,7 @@ const onReset = () => {
       class="flex-auto outline-none px-4 py-2 bg-transparent placeholder-s-500 dark:placeholder-s-400"
       @input="$emit('on-input')"
     />
-    <slot name="after" :onReset="onReset"></slot>
+    <slot name="after" :onReset="onReset" :empty="empty"></slot>
   </div>
   <slot name="error">
     <FError :error="error" />

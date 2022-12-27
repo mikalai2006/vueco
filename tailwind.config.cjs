@@ -128,7 +128,7 @@ module.exports = {
       purple: colors.purple,
       second: colors.neutral,
       p: colors.cyan, // primary -purple -violet
-      s: colors.zinc, // second -slate
+      s: colors.gray, // second -slate
       su: colors.green, // success
       d: colors.red, // danger -red
       a: colors.orange, // accent

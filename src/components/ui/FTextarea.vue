@@ -48,6 +48,8 @@ const onSetFocus = () => {
   if (el && el?.input) el?.input.focus();
 };
 
+const empty = computed(() => model.value == "");
+
 const onReset = () => {
   model.value = "";
   emit("on-input");
@@ -65,7 +67,7 @@ const onReset = () => {
   <div
     class="flex items-center"
     :class="[
-      'rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 placeholder-s-400 dark:placeholder-s-400 bg-white dark:bg-s-900',
+      'rounded-md border text-base transition w-full appearance-none outline-none focus-within:ring-1 hover:ring-1 bg-white dark:bg-s-900',
       {
         'border-d-500 dark:border-d-500 focus-within:ring-d-500 focus-within:border-d-500 hover:ring-d-500':
           error,
@@ -86,7 +88,7 @@ const onReset = () => {
       class="flex-auto outline-none px-4 py-2 bg-transparent"
       @input="emit('on-input')"
     />
-    <slot name="after" :onReset="onReset"></slot>
+    <slot name="after" :onReset="onReset" :empty="empty"></slot>
   </div>
   <slot name="error">
     <FError :error="error" />
