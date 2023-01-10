@@ -77,6 +77,7 @@ export const MenuContext = Symbol(
 ) as InjectionKey<StateMenuDefinition>;
 
 export const LMenu = defineComponent({
+  name: "LMenu",
   props: {
     field: {
       type: Object as PropType<IMenuField>,

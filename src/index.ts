@@ -12,6 +12,7 @@ export * from "./components/ui";
 
 export * from "./directives/ripple";
 export * from "./directives/autofocus";
+export * from "./directives/tooltip";
 
 // import Hello from './components/Hello'
 // import Btn from './components/Btn'

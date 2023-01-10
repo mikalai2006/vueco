@@ -44,7 +44,8 @@ exports[`FCombobox > renders properly 1`] = `
       </ul>
     </div>
   </div>
-</div>"
+</div>
+<!--v-if-->"
 `;
 
 exports[`FCombobox a11y > autocomplete both 1`] = `
@@ -65,7 +66,8 @@ exports[`FCombobox a11y > autocomplete both 1`] = `
       </ul>
     </div>
   </div>
-</div>"
+</div>
+<!--v-if-->"
 `;
 
 exports[`FCombobox a11y > autocomplete none 1`] = `
@@ -88,7 +90,8 @@ exports[`FCombobox a11y > autocomplete none 1`] = `
       </ul>
     </div>
   </div>
-</div>"
+</div>
+<!--v-if-->"
 `;
 
 exports[`FCombobox a11y > role=listbox 1`] = `
@@ -109,7 +112,8 @@ exports[`FCombobox a11y > role=listbox 1`] = `
       </ul>
     </div>
   </div>
-</div>"
+</div>
+<!--v-if-->"
 `;
 
 exports[`FCombobox a11y > test aria-activedescendant(last) 1`] = `
@@ -150,5 +154,6 @@ exports[`FCombobox a11y > test aria-activedescendant(last) 1`] = `
       </ul>
     </div>
   </div>
-</div>"
+</div>
+<!--v-if-->"
 `;

@@ -2,12 +2,14 @@ import { app } from "@storybook/vue3";
 
 import "../src/assets/css/tailwindcss.scss";
 
-import { ripple } from "../src/directives/ripple";
-app.directive("ripple", ripple);
+// import { ripple } from "../src/directives/ripple";
+// app.directive("ripple", ripple);
 import { autofocus } from "../src/directives/autofocus";
 app.directive("autofocus", autofocus);
-import { LBtn } from "../src/components/LBtn";
-app.component("LBtn", LBtn);
+import { tooltip } from "../src/directives/tooltip";
+app.directive("tooltip", tooltip);
+// import { LBtn } from "../src/components/LBtn";
+// app.component("LBtn", LBtn);
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -62,6 +64,13 @@ export const decorators = [
     const theme = context.globals.theme;
     return {
       data: () => {
+        const [body, _] = document.getElementsByTagName("body");
+        if (body) {
+          body.classList.remove("dark");
+          body.classList.remove("light");
+          body.classList.add(theme);
+        }
+
         return {
           theme,
         };

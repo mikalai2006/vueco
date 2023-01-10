@@ -1,6 +1,5 @@
 import { ref } from "vue";
 
-import type { Meta } from "@storybook/vue3";
 // import vitestResults from "@/unit-test-results.json";
 
 // import FCombobox from "@/components/ui/FCombobox.vue";
@@ -13,30 +12,58 @@ import {
   LMenuItemWrapper,
 } from "@/components/LMenu";
 import { LBtn } from "@/components/LBtn";
+import FMenu from "@/components/ui/FMenu.vue";
 import FButton from "@/components/ui/FButton.vue";
 
 export default {
-  title: "Components/LMenux",
-  component: LMenu,
-  subcomponents: {
-    LMenuButton,
-    LMenuItem,
-    LMenuItems,
-    LMenuItemWrapper,
-  },
+  title: "Components/FMenu",
+  component: FMenu,
   parameters: {
     // vitest: {
     //   testFile: "FCombobox.spec.ts",
     //   testResults: vitestResults,
     // },
   },
-} as Meta;
+};
 
 import {
   iChevronDown,
   // iCheck,
   // iClose,
 } from "@/stories/composable/useIcon";
+
+const SimpleTemplate = (args: any) => ({
+  components: {
+    FMenu,
+    LBtn,
+
+    FButton,
+
+    LMenu,
+    LMenuButton,
+    LMenuItems,
+    LMenuItemWrapper,
+    LMenuItem,
+  },
+  setup() {
+    const activeMenuitem = ref("");
+
+    return {
+      activeMenuitem,
+    };
+  },
+  template: `
+    <div class="h-64">
+      <FMenu v-model="activeMenuitem"></FMenu>
+    </div>
+  `,
+});
+
+export const Simple: any = SimpleTemplate.bind({});
+Simple.args = {
+  // modelValue: [],
+  // field: schema,
+};
 
 const DefaultTemplate = (args: any) => ({
   components: {

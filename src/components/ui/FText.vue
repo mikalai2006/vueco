@@ -9,6 +9,7 @@ export default defineComponent({
 import { computed, ref } from "vue";
 
 import { LInputText } from "@/components/LInput";
+import { LFormFieldLabel, LFormFieldDescription } from "@/components/LForm";
 import type { IField } from "@/components/LForm";
 import FError from "./FError.vue";
 
@@ -61,7 +62,17 @@ const onReset = () => {
     :id="field.id"
     :required="required"
     :onSetFocus="onSetFocus"
-  ></slot>
+  >
+    <LFormFieldLabel
+      v-if="field.label"
+      :field="field"
+      class="flex-none block font-medium mb-1"
+      @onSetFocus="onSetFocus"
+    >
+      {{ field.label }}
+      <span v-if="required" class="text-d-600 dark:text-d-400">*</span>
+    </LFormFieldLabel>
+  </slot>
   <div
     class="flex items-center"
     :class="[
@@ -88,8 +99,16 @@ const onReset = () => {
     />
     <slot name="after" :onReset="onReset" :empty="empty"></slot>
   </div>
-  <slot name="error">
+  <slot v-if="error" name="error">
     <FError :error="error" />
   </slot>
-  <slot name="description"></slot>
+  <slot name="description">
+    <LFormFieldDescription
+      v-if="field.description"
+      :field="field"
+      class="mt-2 text-sm leading-none text-s-600 dark:text-s-400"
+    >
+      {{ field.description }}
+    </LFormFieldDescription>
+  </slot>
 </template>

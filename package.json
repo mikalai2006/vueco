@@ -33,6 +33,7 @@
     "storybook-docs": "start-storybook --docs --no-manager-cache"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.6",
     "cross-env": "^7.0.3",
     "pinia": "^2.0.23",
     "vue": "^3.2.41",

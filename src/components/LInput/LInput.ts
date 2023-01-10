@@ -101,11 +101,11 @@ export const LInputNumber = defineComponent({
       () => {
         // model.value = +props.modelValue
         emit("update:modelValue", +props.modelValue);
-        if (props.modelValue > props.max && props.max != 0) {
-          emit("update:modelValue", props.max);
+        if (props.field.max && props.modelValue > props.field.max) {
+          emit("update:modelValue", props.field.max);
         }
-        if (props.modelValue < props.min && props.min != 0) {
-          emit("update:modelValue", props.min);
+        if (props.field.min && props.modelValue < props.field.min) {
+          emit("update:modelValue", props.field.min);
         }
       },
       {
@@ -120,8 +120,14 @@ export const LInputNumber = defineComponent({
           id,
           name: id,
           type: "number",
-          min: props.min || undefined,
-          max: props.max || undefined,
+          min:
+            props.field.min || props.field.min == 0
+              ? props.field.min
+              : undefined,
+          max:
+            props.field.max || props.field.max == 0
+              ? props.field.max
+              : undefined,
           placeholder: props.field.placeholder,
           "aria-labelledby": `${id}_label`,
           "aria-describedby": props.field.description

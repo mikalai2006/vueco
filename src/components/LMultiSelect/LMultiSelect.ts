@@ -24,6 +24,7 @@ import type { IField } from "@/components/LForm";
 
 // composable function
 import { useId } from "@/composable/useId";
+import { emit } from "process";
 
 enum EError {
   "noParent" = "%s must be use inner %s component!",
@@ -101,6 +102,7 @@ export type StateDefinition = {
 
   onChangeActiveIndex: (e: KeyboardEvent) => number;
   onChooseOption: (option: ISelectModel) => void;
+  onChooseGroup: (group: TGroups) => void;
   onSetFocus: () => void;
 };
 
@@ -129,7 +131,14 @@ export const LMultiSelect = defineComponent({
       },
     },
   },
-  emits: ["update:showList", "update:modelValue", "onLoadItems", "on-input"],
+  emits: [
+    "update:showList",
+    "update:modelValue",
+    "onLoadItems",
+    "on-input",
+    "on-choose",
+    "on-choose-group",
+  ],
   setup(props, { emit, slots, expose }) {
     const close = (e: Event) => {
       const el = e.target as HTMLInputElement;
@@ -147,13 +156,11 @@ export const LMultiSelect = defineComponent({
     const unRegisterOverlay = () => {
       document.removeEventListener("click", close);
       document.removeEventListener("keyup", close);
-      console.log("unRegisterOverlay");
     };
 
     const registerOverlay = () => {
       document.addEventListener("click", close);
       document.addEventListener("keyup", close);
-      console.log("registerOverlay");
     };
 
     const searchEl = ref<StateDefinition["searchEl"]["value"]>(null);
@@ -187,16 +194,18 @@ export const LMultiSelect = defineComponent({
       get() {
         return props.field.multiple && Array.isArray(props.modelValue)
           ? [...props.modelValue]
-          : [props.modelValue];
+          : props.modelValue
+          ? [props.modelValue]
+          : [];
       },
       set(value) {
         const newValue = field.value.multiple ? value : value[0];
-        emit("update:modelValue", newValue), emit("on-input");
+        emit("update:modelValue", newValue), emit("on-input", newValue);
       },
     });
 
     const filteredOptions = computed(() => {
-      console.time("filteredOptions");
+      // console.time("filteredOptions");
 
       const allOptions = field.value.items || [];
       let result: TSelectItem[] = allOptions;
@@ -218,7 +227,7 @@ export const LMultiSelect = defineComponent({
               select.model.value.indexOf(b[keyFilter])
           );
       }
-      console.timeEnd("filteredOptions");
+      // console.timeEnd("filteredOptions");
       return result;
     });
     /**
@@ -244,7 +253,6 @@ export const LMultiSelect = defineComponent({
 
     const groups = computed(() => {
       // <StateDefinition["groups"]["value"]>
-      console.time("groupscomputed");
       const groups: TGroups = {}; // new Set()
       if (!groupkey) {
         groups["default"] = {
@@ -277,8 +285,6 @@ export const LMultiSelect = defineComponent({
             }
           });
       }
-      console.timeEnd("groupscomputed");
-      console.log("groups=", groups);
       return groups; // Object.keys(groups)
     });
 
@@ -316,8 +322,6 @@ export const LMultiSelect = defineComponent({
       // select.updateModel(
       //   select.schema.value.multiple ? select.model.value : select.model.value
       // )
-      console.log("chooseItemsOfRange");
-      console.log({ range }, select.model.value);
     };
 
     /**
@@ -341,7 +345,34 @@ export const LMultiSelect = defineComponent({
       } else {
         newValue = [value];
       }
+      emit("on-choose", option);
       select.model.value = newValue;
+    };
+
+    /**
+     * Choose group options
+     */
+    const onChooseGroup = (group: TGroups) => {
+      console.time("chooseGroup");
+      if (!select?.field.value.multiple) {
+        return;
+      }
+      const { length, selected } = group;
+      const allOptionsOfGroup = select.field.value.items
+        .filter((x) =>
+          select.groupkey ? x[select.groupkey] === group.key : true
+        )
+        .map((x) =>
+          select.field.value.keyValue ? x[select.field.value.keyValue] : x
+        );
+      emit("on-choose-group", allOptionsOfGroup);
+
+      const newValue =
+        length !== selected
+          ? select.model.value.concat(allOptionsOfGroup)
+          : select.model.value.filter((x) => allOptionsOfGroup.indexOf(x) < 0);
+      select.model.value = newValue;
+      console.timeEnd("chooseGroup");
     };
 
     /**
@@ -369,7 +400,6 @@ export const LMultiSelect = defineComponent({
         newIndex = 0;
       }
 
-      console.log("onChangeActiveIndex: newIndex=", newIndex);
       // select.focusOption.value = newIndex;
       return newIndex;
     };
@@ -405,18 +435,11 @@ export const LMultiSelect = defineComponent({
       //   // return;
       // }
       nextTick(() => {
-        console.log(
-          "onSetFocus: index=",
-          index,
-          " select.focusOption.value=",
-          select.focusOption.value
-        );
         const value = select.filteredOptions.value[select.focusOption.value];
         const elForFocus = select.optionsEl.value.find(
           (x) => x.key === (keyValue ? value[keyValue] : value)
         );
         if (elForFocus.el) {
-          console.log("elForFocus.el=", elForFocus.el);
           //  && !select.searchEl.value
           elForFocus.el?.focus();
         }
@@ -474,11 +497,12 @@ export const LMultiSelect = defineComponent({
       chooseItemsOfRange,
       onLoadItems: () => emit("onLoadItems"),
       updateModel: (val: ISelectModel) => {
-        emit("update:modelValue", val), emit("on-input");
+        emit("update:modelValue", val), emit("on-input", val);
       },
 
       onChangeActiveIndex,
       onChooseOption,
+      onChooseGroup,
       onSetFocus,
     };
 
@@ -577,7 +601,6 @@ export const LMultiSelectButton = defineComponent({
           ...propsType.value,
           onClick: withModifiers(() => {
             // e: MouseEvent
-            console.log("LMultiSelectButton: onClick");
             // nextTick(() => {
             //   select.searchEl.value?.focus();
             // });
@@ -605,13 +628,12 @@ export const LMultiSelectButton = defineComponent({
             // console.log('click select button', select.show.value)
           }, []),
           onKeydown: withModifiers((e: KeyboardEvent) => {
-            console.log("LMultiSelectButton: onKeydown");
             switch (e.key) {
               case "Enter":
-                console.log(
-                  "select.focusOption.value=",
-                  select.focusOption.value
-                );
+                // console.log(
+                //   "select.focusOption.value=",
+                //   select.focusOption.value
+                // );
 
                 select.onChooseOption(
                   select.filteredOptions.value[select.focusOption.value]
@@ -633,8 +655,6 @@ export const LMultiSelectButton = defineComponent({
                 break;
               case "ArrowUp":
               case "ArrowDown":
-                console.log("Key press down");
-
                 if (!select.show.value) {
                   select.show.value = true;
                   // console.log(`select ${select.focusOption.value}`)
@@ -979,7 +999,6 @@ export const LMultiSelectOptions = defineComponent({
                 () => select.clearSearchQuery(),
                 350
               );
-              console.log("Key press of options", e.key);
 
               // select all options
               if (e.ctrlKey && e.key === "a") {
@@ -1059,9 +1078,7 @@ export const LMultiSelectOptions = defineComponent({
               select.indexShiftTo.value = 0;
             }
           },
-          onFocus: () => {
-            console.log("LMultiSelectOptions: onFocus");
-          },
+          onFocus: () => {},
         },
         slots.default
           ? slots.default({
@@ -1082,7 +1099,7 @@ export const LMultiSelectGroup = defineComponent({
       required: true,
     },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, emit }) {
     const select = inject(SelectContext);
     if (!select) {
       return;
@@ -1091,31 +1108,6 @@ export const LMultiSelectGroup = defineComponent({
     const id = useId();
 
     const currentGroup = computed(() => select.groups.value[props.group]);
-
-    /**
-     * Choose group options
-     */
-    const chooseGroup = () => {
-      console.time("chooseGroup");
-      if (!select?.field.value.multiple) {
-        return;
-      }
-      const { length, selected } = currentGroup.value;
-      const allOptionsOfGroup = select.field.value.items
-        .filter((x) =>
-          select.groupkey ? x[select.groupkey] === props.group : true
-        )
-        .map((x) =>
-          select.field.value.keyValue ? x[select.field.value.keyValue] : x
-        );
-
-      const newValue =
-        length !== selected
-          ? select.model.value.concat(allOptionsOfGroup)
-          : select.model.value.filter((x) => allOptionsOfGroup.indexOf(x) < 0);
-      select.model.value = newValue;
-      console.timeEnd("chooseGroup");
-    };
 
     /**
      * options for current group
@@ -1144,7 +1136,7 @@ export const LMultiSelectGroup = defineComponent({
           // tabindex: -1, // disabled === true ? undefined : -1,
           // 'aria-selected': false,
           onClick: withModifiers(() => {
-            chooseGroup();
+            select.onChooseGroup(currentGroup.value);
           }, ["stop"]),
         },
         slots.default
@@ -1247,8 +1239,6 @@ export const LMultiSelectOption = defineComponent({
           tabindex: -1, // disabled === true ? undefined : -1,
           "aria-selected": selected.value === true ? selected.value : undefined,
           onFocus: () => {
-            console.log("LMultiSelectOption: onFocus");
-
             // if (select.pressShift.value) {
             //   chooseItem()
             // }
@@ -1284,7 +1274,7 @@ export const LMultiSelectOption = defineComponent({
             }
           },
           onMouseenter: (e) => {
-            console.log("LMultiSelectOption: onMouseenter");
+            // console.log("LMultiSelectOption: onMouseenter");
 
             select.focusOption.value = index.value;
             if (!e.shiftKey) {
@@ -1294,7 +1284,7 @@ export const LMultiSelectOption = defineComponent({
             }
           },
           onMouseleave: (e) => {
-            console.log("LMultiSelectOption: onMouseleave");
+            // console.log("LMultiSelectOption: onMouseleave");
 
             select.focusOption.value = null;
             if (!e.shiftKey) {
@@ -1303,7 +1293,7 @@ export const LMultiSelectOption = defineComponent({
           },
           onClick: withModifiers(
             (e) => {
-              console.log("LMultiSelectOption: onClick");
+              // console.log("LMultiSelectOption: onClick");
               if (e.shiftKey) {
                 select.chooseItemsOfRange({
                   range: {

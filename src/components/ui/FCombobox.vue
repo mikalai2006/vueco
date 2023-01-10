@@ -22,6 +22,9 @@ import { iChevronDown, iCheck } from "@/stories/composable/useIcon";
 
 import { LSpinner } from "@/components/LSpinner";
 import { LIcon } from "@/components/LIcon";
+import { ripple } from "@/directives/ripple";
+
+const vRipple = ripple;
 
 const props = withDefaults(
   defineProps<{
@@ -41,7 +44,12 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:modelValue", "on-input", "on-load-items"]);
+const emit = defineEmits([
+  "update:modelValue",
+  "onInput",
+  "onLoadItems",
+  "onChoose",
+]);
 
 const model = computed<TComboboxModel>({
   get() {
@@ -88,7 +96,7 @@ const onReset = async () => {
       break;
   }
   model.value = newValue;
-  await emit("on-input");
+  await emit("onInput");
   await onSetFocus();
 };
 
@@ -120,13 +128,14 @@ const showList = ref(false);
     <LCombobox
       v-bind="$attrs"
       v-model="model"
-      v-model:showList="showList"
+      v-model:show-list="showList"
       :field="field"
       :error="error"
       class="relative flex-auto"
       #default="{ isOpen, isBusy, isNone }"
-      @on-load-items="$emit('on-load-items')"
-      @on-input="$emit('on-input')"
+      @on-load-items="$emit('onLoadItems')"
+      @on-input="$emit('onInput', $event)"
+      @on-choose="$emit('onChoose', $event)"
     >
       <div
         :class="['outline-none flex space-x-2 items-center w-full transition']"
@@ -243,6 +252,6 @@ const showList = ref(false);
       </div>
     </LCombobox>
   </div>
-  <slot name="error" :error="error"></slot>
+  <slot v-if="error" name="error" :error="error"></slot>
   <slot name="description"></slot>
 </template>

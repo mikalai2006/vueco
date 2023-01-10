@@ -5,6 +5,7 @@
   }
   body,
   .docs-story,
+  .sbdocs-wrapper,
   .app {
     @apply bg-white dark:bg-s-900;
   }
@@ -13,8 +14,16 @@
   }
   body,
   .docs-story,
+  .sbdocs-wrapper,
   .app {
     @apply font-sans font-normal text-base text-s-800 dark:text-s-200;
+  }
+  .dark .sbdocs-preview {
+    @apply border-s-800 shadow-none;
+  }
+  .dark .os-host,
+  .dark .panel-tab-content {
+    @apply bg-s-900;
   }
 }
 

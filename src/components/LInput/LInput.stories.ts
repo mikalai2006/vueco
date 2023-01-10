@@ -1,8 +1,9 @@
 import { ref } from "vue";
-import { LInputText } from "@/components/LInput";
+import { LInputText, LInputCheckbox } from "@/components/LInput";
 
 import FText from "@/components/ui/FText.vue";
 import FCheckboxGroup from "@/components/ui/FCheckboxGroup.vue";
+import FCheckbox from "@/components/ui/FCheckbox.vue";
 
 import { useValidate } from "@/composable/useValidate";
 import type { IField } from "@/components/LForm/LForm";
@@ -72,6 +73,66 @@ export const InputText = (args: any) => ({
       <label :for="id">lab {{ schema.label }}</label>
     </template>
   </FText>
+  `,
+});
+
+export const FCheckboxInput = (args: any) => ({
+  components: { FCheckbox },
+  setup() {
+    const form = ref({
+      check: false,
+    });
+
+    const schema = {
+      id: "text",
+      component: "LInputText",
+      name: "text",
+      label: "Test text",
+      description: "Help text for input field",
+      placeholder: "Input test text ...",
+      type: "text",
+      autofocus: true,
+      vtype: "string",
+      rules: [
+        {
+          type: "required",
+          params: ["This field is required"],
+        },
+        {
+          type: "min",
+          params: [5, "Email cannot be more than 5 characters"],
+        },
+        {
+          type: "max",
+          params: [15, "Email cannot be less than 15 characters"],
+        },
+        {
+          type: "matches",
+          params: [/^[a-zA-Z]+$/, "Please enter only letter text"],
+        },
+      ],
+    };
+
+    const { errors, onValidate, onCreateSchema } = useValidate();
+    onCreateSchema([schema]);
+
+    const onInput = async (field: IField) => {
+      if (field.name) {
+        await onValidate(field.name, form.value);
+      }
+    };
+
+    return {
+      form,
+      args,
+      errors,
+      schema,
+      onInput,
+    };
+  },
+  template: `
+  <FCheckbox :field="schema" v-model="form.check" @on-input="onInput">
+  </FCheckbox>
   `,
 });
 

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, type PropType } from "vue";
-import { LBtn, TypeBtnTag, TypeBtnMode } from "@/components/LBtn";
+import { LBtn } from "@/components/LBtn";
+import { TypeBtnTag, TypeBtnMode } from "@/components/LBtn";
 import { ripple } from "@/directives/ripple";
 
 const vRipple = ripple;
@@ -37,7 +38,7 @@ defineEmits(["update:pressed"]);
 
 const cssClass = computed(() => {
   let _class =
-    "relative py-2 px-4 font-medium b-rounded outline-none cursor-pointer transition focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-s-900";
+    "relative py-2 px-4 font-medium rounded-md outline-none cursor-pointer transition focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-s-900";
   switch (props.mode as keyof typeof TypeBtnMode) {
     case TypeBtnMode.primary:
       _class +=

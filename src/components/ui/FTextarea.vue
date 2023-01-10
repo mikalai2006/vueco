@@ -90,7 +90,7 @@ const onReset = () => {
     />
     <slot name="after" :onReset="onReset" :empty="empty"></slot>
   </div>
-  <slot name="error">
+  <slot v-if="error" name="error">
     <FError :error="error" />
   </slot>
   <slot name="description"></slot>

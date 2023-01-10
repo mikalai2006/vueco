@@ -2,7 +2,7 @@ import { ref } from "vue";
 
 import { ArgsTable, Source, Canvas, Meta, Story } from "@storybook/addon-docs";
 
-import { LBtn } from "@/components/LBtn";
+import { LBtn, TypeBtnTag } from "@/components/LBtn";
 import LIcon from "../LIcon/LIcon";
 import FSpinner from "@/components/ui/FSpinner.vue";
 import dedent from "ts-dedent";
@@ -16,44 +16,84 @@ export const iCart =
 
 <Meta
   title="components/Buttons"
-  component={LBtn}
+  component={FButton}
+  subcomponents={{ LBtn }}
   argTypes={{
-    mode: {
-      control: {
-        type: "select",
-      },
-      options: ["primary", "second", "danger"],
-    },
     as: {
-      control: {
-        type: "select",
-      },
-      options: ["div", "a", "button"],
+      options: ["a", "div", "button"],
     },
-    disabled: {
-      control: "boolean",
-    },
-    fill: {
-      control: "boolean",
+    mode: {
+      options: ["primary", "second", "danger"],
     },
   }}
 />
 
 export const Template = (args) => {
   return {
-    components: { LBtn },
+    components: { FButton },
     setup() {
       return {
-        args: {
-          ...args,
-        },
+        args,
       };
     },
-    template: '<LBtn v-bind="args">Button</LBtn>',
+    template: '<FButton v-bind="args">{{ args.mode }}</FButton>',
   };
 };
 
-# LBtn
+# FButton
+
+## Playground
+
+Change properties to see them in action
+
+<Canvas>
+  <Story
+    name="Playground"
+    args={{
+      as: "a",
+      mode: "second",
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Playground"></ArgsTable>
+
+## WithTooltip
+
+Change properties to see them in action
+
+<Canvas>
+  <Story name="WithTooltip" args={{}}>
+    {(args) => {
+      return {
+        components: { FButton, LIcon },
+        setup() {
+          return {
+            iBell,
+            args,
+          };
+        },
+        template: `
+          <div  v-for="i in 100">
+            <FButton v-bind="args" v-tooltip="{ content: 'Hello button!' }">
+              With tooltip
+            </FButton>
+            <FButton v-bind="args" v-tooltip="{ content: 'Hello button!' }">
+              With tooltip
+            </FButton>
+            <FButton v-bind="args" v-tooltip="{ content: 'Hello button!' }">
+              With tooltip
+            </FButton>
+          </div>
+        `,
+      };
+    }}
+  </Story>
+</Canvas>
+
+<ArgsTable story="WithTooltip"></ArgsTable>
 
 ## All
 
@@ -85,7 +125,7 @@ export const Template = (args) => {
             </FButton>
           </div>
           <div class="p-2">
-            <FButton fill aria-label="bell">
+            <FButton v-tooltip:left="{content:'Hello Popper (left)', showTriggers: ['click'], hideTriggers: ['click']}" fill aria-label="bell">
               <span class="flex items-center space-x-2">
                 <LIcon role="presentation">
                   {{iBell}}
@@ -104,7 +144,7 @@ export const Template = (args) => {
             <FButton mode="primary">Primary</FButton>
           </div>
           <div class="p-2">
-            <FButton mode="primary" fill>Primary</FButton>
+            <FButton mode="primary" fill  v-tooltip:left="{content:'Hello Popper (left)'}">Primary</FButton>
           </div>
           <div class="p-2">
             <FButton mode="primary" aria-label="bell">
@@ -134,7 +174,7 @@ export const Template = (args) => {
         <h2>Danger</h2>
         <div class="flex flex-wrap">
           <div class="p-2">
-            <FButton mode="danger">Danger</FButton>
+            <FButton v-tooltip:right="{content:'Hello Popper (right)', showTriggers: ['click'], hideTriggers: ['click']}" mode="danger">Danger</FButton>
           </div>
           <div class="p-2">
             <FButton mode="danger" fill>Danger</FButton>
@@ -147,7 +187,7 @@ export const Template = (args) => {
             </FButton>
           </div>
           <div class="p-2">
-            <FButton mode="danger" fill>
+            <FButton  v-tooltip="{content:'Hello Popper (top)', placement: 'top'}" mode="danger" fill>
               <span class="flex items-center space-x-2">
                 <span>Danger</span>
                 <LIcon role="presentation">
@@ -170,7 +210,7 @@ export const Template = (args) => {
         <h2>Link</h2>
         <div class="flex flex-wrap">
           <div class="p-2">
-            <FButton mode="link">Danger</FButton>
+            <FButton v-tooltip:left="{content:'Hello Popper (left)'}" mode="link">Danger</FButton>
           </div>
           <div class="p-2">
             <FButton mode="link" fill>Danger</FButton>

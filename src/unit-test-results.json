@@ -8,7 +8,7 @@
   "numFailedTests": 0,
   "numPendingTests": 0,
   "numTodoTests": 0,
-  "startTime": 1671565565920,
+  "startTime": 1673338298026,
   "success": true,
   "testResults": [
     {
@@ -21,7 +21,7 @@
           "fullName": " Combobox with autocomplete should be render with default options",
           "status": "passed",
           "title": "should be render with default options",
-          "duration": 45,
+          "duration": 47,
           "failureMessages": []
         },
         {
@@ -32,7 +32,7 @@
           "fullName": " Combobox with autocomplete should be by press ArrowDown ",
           "status": "passed",
           "title": "should be by press ArrowDown ",
-          "duration": 12,
+          "duration": 11,
           "failureMessages": []
         },
         {
@@ -43,7 +43,7 @@
           "fullName": " Combobox with autocomplete LCombobox filter",
           "status": "passed",
           "title": "LCombobox filter",
-          "duration": 7,
+          "duration": 6,
           "failureMessages": []
         },
         {
@@ -54,7 +54,7 @@
           "fullName": " FCombobox renders properly",
           "status": "passed",
           "title": "renders properly",
-          "duration": 12,
+          "duration": 13,
           "failureMessages": []
         },
         {
@@ -65,7 +65,7 @@
           "fullName": " FCombobox a11y autocomplete none",
           "status": "passed",
           "title": "autocomplete none",
-          "duration": 9,
+          "duration": 10,
           "failureMessages": []
         },
         {
@@ -76,7 +76,7 @@
           "fullName": " FCombobox a11y autocomplete both",
           "status": "passed",
           "title": "autocomplete both",
-          "duration": 8,
+          "duration": 10,
           "failureMessages": []
         },
         {
@@ -87,7 +87,7 @@
           "fullName": " FCombobox a11y role=listbox",
           "status": "passed",
           "title": "role=listbox",
-          "duration": 9,
+          "duration": 8,
           "failureMessages": []
         },
         {
@@ -109,7 +109,7 @@
           "fullName": " FCombobox a11y test aria-activedescendant(first)",
           "status": "passed",
           "title": "test aria-activedescendant(first)",
-          "duration": 8,
+          "duration": 9,
           "failureMessages": []
         },
         {
@@ -120,12 +120,12 @@
           "fullName": " FCombobox a11y test aria-activedescendant(last)",
           "status": "passed",
           "title": "test aria-activedescendant(last)",
-          "duration": 8,
+          "duration": 9,
           "failureMessages": []
         }
       ],
-      "startTime": 1671565567390,
-      "endTime": 1671565567514,
+      "startTime": 1673338299711,
+      "endTime": 1673338299841,
       "status": "passed",
       "message": "",
       "name": "E:/vue3/ui/vueco/src/test/FCombobox.spec.ts"

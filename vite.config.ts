@@ -42,7 +42,7 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
-    dedupe: ["vue"],
+    dedupe: ["vue", "@popperjs/core"],
   },
   build: {
     lib: {
@@ -55,12 +55,13 @@ export default defineConfig({
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
       // into your library
-      external: ["vue"],
+      external: ["vue", "@popperjs/core"],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
         globals: {
           vue: "Vue",
+          "@popperjs/core": "@popperjs/core",
         },
       },
     },

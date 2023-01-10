@@ -9,7 +9,7 @@ const createRipple = (event: any) => {
   const button = event.currentTarget;
   const options = event.currentTarget.ripple_options;
   const preCircle = document.createElement("div");
-  preCircle.className += "overflow-hidden absolute inset-0 b-rounded";
+  preCircle.className += "overflow-hidden absolute inset-0 rounded-md";
   const circle = document.createElement("span");
   const diameter = Math.max(button.clientWidth, button.clientHeight);
   const radius = diameter / 2;
@@ -42,8 +42,6 @@ export const ripple = {
       const options = binding.value;
       el.addEventListener("click", createRipple);
       el.ripple_options = options;
-    } else {
-      console.log("Not found value for ripple", el, binding.value);
     }
   },
   updated(el: any, binding: any) {

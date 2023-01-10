@@ -206,7 +206,13 @@ export const LCombobox = defineComponent({
     },
     // ...IGeneralPropsFormElement,
   },
-  emits: ["update:showList", "update:modelValue", "onLoadItems", "on-input"],
+  emits: [
+    "update:showList",
+    "update:modelValue",
+    "onLoadItems",
+    "onInput",
+    "onChoose",
+  ],
   setup(props, { slots, emit }) {
     const autocomplete = computed<
       StateComboboxDefinition["autocomplete"]["value"]
@@ -249,7 +255,7 @@ export const LCombobox = defineComponent({
       },
       set(value) {
         const newValue = field.value.multiple ? value : value[0];
-        emit("update:modelValue", newValue), emit("on-input");
+        emit("update:modelValue", newValue), emit("onInput", newValue);
       },
     });
 
@@ -282,18 +288,20 @@ export const LCombobox = defineComponent({
       } else {
         if (_keyFilter) {
           _filteredOptions = _allOptions
-            .filter((x) =>
+            .filter((x: any) =>
               typeof x == "object"
                 ? x[_keyFilter].toLowerCase().indexOf(_filter) === 0
-                : typeof x == "number"
-                ? x !== -1
-                : x.toLowerCase().indexOf(_filter) === 0
+                : false
             )
             .sort(
               (a: any, b: any) =>
                 combobox.model.value.indexOf(a[_keyFilter]) -
                 combobox.model.value.indexOf(b[_keyFilter])
             );
+        } else {
+          _filteredOptions = _allOptions.filter((x) =>
+            typeof x == "string" ? x.toLowerCase().indexOf(_filter) === 0 : ""
+          );
         }
       }
 
@@ -496,6 +504,7 @@ export const LCombobox = defineComponent({
         combobox.field.value.keyValue && typeof option == "object"
           ? option[combobox.field.value.keyValue]
           : option;
+      emit("onChoose", value);
       const index = combobox.model.value.findIndex((x: any) => x === value);
       let newValue = [...combobox.model.value];
       if (combobox.field.value.multiple) {

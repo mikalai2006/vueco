@@ -58,8 +58,6 @@ const Default = (args: any) => ({
     const required = ref(args.required);
 
     const onLoadItems = async (params) => {
-      console.log("onLoadItems: ", params);
-
       /**
        * fetch items for options
        */
@@ -84,6 +82,16 @@ const Default = (args: any) => ({
     //   await onLoadItems()
     // })
 
+    const onInput = (e) => {
+      console.log("onInput", e);
+    };
+    const onChoose = (e) => {
+      console.log("onChoose", e);
+    };
+    const onChooseGroup = (e) => {
+      console.log("onChooseGroup", e);
+    };
+
     return {
       selectModel,
       field,
@@ -91,6 +99,9 @@ const Default = (args: any) => ({
       required,
 
       onLoadItems,
+      onInput,
+      onChoose,
+      onChooseGroup,
 
       iChevronDown,
       iCheck,
@@ -107,6 +118,9 @@ const Default = (args: any) => ({
         :error="error"
         :required="required"
         @on-load-items="onLoadItems"
+        @on-input="onInput"
+        @on-choose="onChoose"
+        @on-choose-group="onChooseGroup"
       >
         <template #selected-item="{ removeOption, option }">
           <span class="p-1">
@@ -231,8 +245,6 @@ const WithImages = (args: any) => ({
     const required = ref(args.required);
 
     const onLoadItems = async (params) => {
-      console.log("onLoadItems: ", params);
-
       /**
        * fetch items for options
        */

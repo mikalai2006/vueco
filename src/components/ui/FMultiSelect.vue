@@ -48,7 +48,13 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:modelValue", "on-input", "on-load-items"]);
+const emit = defineEmits([
+  "update:modelValue",
+  "on-input",
+  "on-load-items",
+  "on-choose",
+  "on-choose-group",
+]);
 
 const model = computed<ISelectModel>({
   get() {
@@ -132,8 +138,10 @@ const showList = ref(false);
       :error="error"
       class="relative flex-auto"
       #default="{ show, loading, selectedOptions }"
-      @on-load-items="$emit('on-load-items')"
-      @on-input="$emit('on-input')"
+      @on-load-items="$emit('on-load-items', $event)"
+      @on-input="$emit('on-input', $event)"
+      @on-choose="$emit('on-choose', $event)"
+      @on-choose-group="$emit('on-choose-group', $event)"
     >
       <LMultiSelectButton
         ref="inputElement"

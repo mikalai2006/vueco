@@ -1,16 +1,17 @@
-@import './variables.scss';
+@import "./variables.scss";
 
-@import 'tailwindcss/base';
-@import './base.scss';
+@import "tailwindcss/base";
+@import "./base.scss";
 
-@import 'tailwindcss/components';
-@import './button.scss';
-@import './form.scss';
-@import './icon.scss';
-@import './transition.css';
-@import './typography.scss';
+@import "tailwindcss/components";
+@import "./button.scss";
+@import "./tooltip.scss";
+@import "./form.scss";
+@import "./icon.scss";
+@import "./transition.css";
+@import "./typography.scss";
 
-@import 'tailwindcss/utilities';
+@import "tailwindcss/utilities";
 
 @layer base {
   [ripple] .ripple--container .ripple--body {

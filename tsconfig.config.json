@@ -14,6 +14,7 @@
     // "tests/**/*.tsx",
     // "types/index.d.ts",
     "src/index.ts"
+    // "src/components/LMenu/LMenu.stories.mdx"
   ],
   "compilerOptions": {
     "target": "esnext",

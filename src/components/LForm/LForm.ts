@@ -36,7 +36,7 @@ export type TItem = {
   [key: string]: any;
 };
 
-export type IField = {
+export type IField<T = {}> = {
   after?: any;
   autocomplete?: string;
   autofocus?: boolean;
@@ -46,7 +46,7 @@ export type IField = {
   description?: string;
   disabled?: boolean;
   id: string | number;
-  items?: Array<TItem | string | number | { [key: string]: any }>;
+  items?: Array<T>;
   group?: string;
   keyLabel?: string;
   keyValue?: string;
@@ -64,6 +64,8 @@ export type IField = {
   size?: number;
   type?: string;
   vtype?: string;
+  min?: number;
+  max?: number;
 };
 
 export type StateFieldDefinition = {

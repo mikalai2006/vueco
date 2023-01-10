@@ -77,7 +77,6 @@ const selectModel = computed({
   },
   set(value) {
     emit("update:modelValue", value);
-    console.log("set value", value);
   },
 });
 const schemaField = ref(props.schema);
