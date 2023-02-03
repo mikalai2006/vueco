@@ -12,6 +12,8 @@ import FTabs from "@/components/ui/FTabs.vue";
 import { LIcon } from "@/components/LIcon";
 import { iClose } from "@/stories/composable/useIcon";
 
+import { ripple } from "@/directives/ripple";
+
 export default {
   title: "components/LTabs",
   component: LTabs,
@@ -228,6 +230,9 @@ Default.storyName = "Playground";
 const VerticalTabs = (args: any) => ({
   // Components used in your story `template` are defined in the `components` object
   components: { FButton, LIcon, LTabs, LTabsList, LTab, LTabPanels, LTabPanel },
+  directives: {
+    ripple,
+  },
   // The story's `args` need to be mapped into the template through the `setup()` method
   setup() {
     const tabs = ref({
@@ -304,7 +309,6 @@ const VerticalTabs = (args: any) => ({
             v-ripple="{}"
             :mode="selected ? 'second': 'link'"
             :fill="selected"
-            :disabled="true"
           >
             {{ category }}
           </FButton>

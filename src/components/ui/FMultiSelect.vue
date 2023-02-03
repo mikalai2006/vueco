@@ -30,6 +30,9 @@ import {
 import { LSpinner } from "@/components/LSpinner";
 import { LIcon } from "@/components/LIcon";
 
+import { ripple } from "@/directives/ripple";
+const vRipple = ripple;
+
 const props = withDefaults(
   defineProps<{
     /**

@@ -36,7 +36,8 @@ export const Template = (args) => {
         args,
       };
     },
-    template: '<FButton v-bind="args">{{ args.mode }}</FButton>',
+    template:
+      '<FButton v-bind="args" class="capitalize">{{ args.mode }}</FButton>',
   };
 };
 
@@ -76,13 +77,7 @@ Change properties to see them in action
           };
         },
         template: `
-          <div  v-for="i in 100">
-            <FButton v-bind="args" v-tooltip="{ content: 'Hello button!' }">
-              With tooltip
-            </FButton>
-            <FButton v-bind="args" v-tooltip="{ content: 'Hello button!' }">
-              With tooltip
-            </FButton>
+          <div>
             <FButton v-bind="args" v-tooltip="{ content: 'Hello button!' }">
               With tooltip
             </FButton>

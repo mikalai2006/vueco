@@ -96,7 +96,7 @@ const Default = (args: any) => ({
         @on-input="(e) => onInput(e)"
         @on-choose="(e) => onChoose(e)"
       >
-        <template #selected-item="{ removeOption, option }">
+        <template #selected-option="{ option }">
           <span class="p-1 font-medium">
             {{ option[field.keyLabel] }},
           </span>
@@ -133,7 +133,7 @@ const schema = {
   id: "friends",
   name: "friends",
   component: "FCombobox",
-  keyValue: "name", // ключ для свойства
+  keyValue: "website", // ключ для свойства
   keyLabel: "name",
   // keyGroup: 'parentId', // ключ для группировки
   keyFilter: "name",
@@ -203,7 +203,7 @@ const Simple = (args: any) => ({
         :error="error"
         :required="required"
       >
-        <template #selected-item="{ removeOption, option }">
+        <template #selected-item="{ option }">
           <span class="p-1 font-medium">
             {{ option[field.keyLabel] }},
           </span>

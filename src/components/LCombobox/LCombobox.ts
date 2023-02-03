@@ -259,6 +259,14 @@ export const LCombobox = defineComponent({
       },
     });
 
+    const selectedOptions = computed(() => {
+      const _allOptions = field.value.items || [];
+      const _so = _allOptions.filter((x) =>
+        model.value.includes(field.value.keyValue ? x[field.value.keyValue] : x)
+      );
+      return _so;
+    });
+
     const filter = ref<StateComboboxDefinition["filter"]["value"]>("");
     const filterText = ref<StateComboboxDefinition["filterText"]["value"]>("");
     const filteredOptions = ref<
@@ -630,6 +638,7 @@ export const LCombobox = defineComponent({
                 isNone: isNone.value,
                 isOpen: isOpen.value,
                 isBusy: isBusy.value,
+                selectedOptions: selectedOptions.value,
               })
             : [],
       });
@@ -741,6 +750,13 @@ export const LComboboxInput = defineComponent({
                     combobox.close(e, true);
                     combobox.onFilterOptions(true);
                   }
+                } else {
+                  console.log("add custom", combobox.filter.value);
+                  const _customValue = [...combobox.model.value];
+                  _customValue.push(combobox.filter.value);
+                  combobox.filter.value = "";
+                  combobox.filterText.value = "";
+                  combobox.model.value = _customValue;
                 }
                 combobox.filterText.value = "";
                 // if (this.listboxHasVisualFocus) {
@@ -856,10 +872,16 @@ export const LComboboxInput = defineComponent({
                 // break;
                 break;
               case "Home":
+                if (e.shiftKey) {
+                  break;
+                }
                 combobox.comboboxNode.value?.setSelectionRange(0, 0);
                 flag = true;
                 break;
               case "End":
+                if (e.shiftKey) {
+                  break;
+                }
                 combobox.comboboxNode.value?.setSelectionRange(
                   combobox.filter.value.length,
                   combobox.filter.value.length
@@ -1162,10 +1184,10 @@ export const LComboboxButton = defineComponent({
                 combobox.close(e, true);
                 break;
               case "Home":
-                flag = true;
+                // flag = true;
                 break;
               case "End":
-                flag = true;
+                // flag = true;
                 break;
               default:
                 break;

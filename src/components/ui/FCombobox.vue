@@ -132,7 +132,7 @@ const showList = ref(false);
       :field="field"
       :error="error"
       class="relative flex-auto"
-      #default="{ isOpen, isBusy, isNone }"
+      #default="{ isOpen, isBusy, isNone, selectedOptions }"
       @on-load-items="$emit('onLoadItems')"
       @on-input="$emit('onInput', $event)"
       @on-choose="$emit('onChoose', $event)"
@@ -155,22 +155,19 @@ const showList = ref(false);
             </div>
           </LComboboxButton>
           <template v-else>
-            <div
-              v-if="typeof model == 'object' && field.multiple"
-              class="flex flex-row flex-wrap"
-            >
+            <slot name="selected-options" :selected-options="selectedOptions">
               <div
                 v-for="(item, index) in model"
                 :key="index"
-                class="px-2 bg-s-300 dark:bg-s-700 rounded-md mr-1 mb-1"
+                class="float-left px-2 bg-s-300 dark:bg-s-700 rounded-md mr-1 mb-1"
               >
                 {{ item }}
               </div>
-            </div>
+            </slot>
             <LComboboxInput
               ref="inputElement"
               autocomplete="off"
-              class="w-full px-2 py-1 cursor-text outline-none bg-transparent placeholder-s-400"
+              class="px-2 py-1 cursor-text outline-none bg-transparent placeholder-s-400"
             ></LComboboxInput>
           </template>
         </div>

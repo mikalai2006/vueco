@@ -6,6 +6,8 @@ import { LFormFieldLabel, LFormFieldDescription } from "@/components/LForm";
 import { LIcon } from "@/components/LIcon";
 import FError from "@/components/ui/FError.vue";
 
+import { ripple } from "@/directives/ripple";
+
 export default {
   title: "Components/FMultiSelect",
   component: FMultiSelect,
@@ -237,6 +239,9 @@ const WithImages = (args: any) => ({
     LIcon,
 
     FText,
+  },
+  directives: {
+    ripple,
   },
   setup() {
     const field = ref(args.field);

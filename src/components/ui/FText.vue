@@ -94,7 +94,7 @@ const onReset = () => {
       v-model="model"
       :field="field"
       :error="error"
-      class="flex-auto outline-none px-4 py-2 bg-transparent placeholder-s-500 dark:placeholder-s-400"
+      class="w-full flex-auto outline-none px-4 py-2 bg-transparent placeholder-s-500 dark:placeholder-s-400"
       @input="$emit('on-input')"
     />
     <slot name="after" :onReset="onReset" :empty="empty"></slot>

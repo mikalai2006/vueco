@@ -85,7 +85,7 @@ const onReset = () => {
       v-model="model"
       :field="field"
       :error="error"
-      class="flex-auto outline-none px-4 py-2 bg-transparent"
+      class="w-full flex-auto outline-none px-4 py-2 bg-transparent"
       @input="emit('on-input')"
     />
     <slot name="after" :onReset="onReset" :empty="empty"></slot>
