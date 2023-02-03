@@ -1,0 +1,2 @@
+import{d as a,h as r,J as t}from"./vue.esm-bundler.63e44d6a.js";import{L as p}from"./LIcon.a931258d.js";const i=a({name:"LSpinner",components:{LIcon:p},setup:(m,{slots:n})=>{const e=t("LIcon");return()=>r(e,{class:"animate-spin"},()=>n.default?n.default().map(o=>o.children).join(""):"M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z")}});export{i as L};
+//# sourceMappingURL=LSpinner.d97669ba.js.map
